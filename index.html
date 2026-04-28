@@ -289,9 +289,9 @@ body {
    ============================================ */
 .main {
   display: grid;
-  grid-template-columns: 1fr 480px 380px;
+  grid-template-columns: 1fr 440px 420px;
   gap: 12px;
-  padding: 12px 24px;
+  padding: 12px 20px;
   height: calc(100vh - 65px);
   overflow: hidden;
 }
@@ -906,6 +906,28 @@ body {
   gap: 8px;
 }
 
+.form-row-labeled {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.form-row-labeled > .form-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-row-labeled > .form-label .info-icon {
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: help;
+}
+
 .form-group label {
   display: block;
   font-size: 11px;
@@ -1363,7 +1385,7 @@ body {
    ============================================ */
 @media (max-width: 1600px) {
   .main {
-    grid-template-columns: 1fr 440px 340px;
+    grid-template-columns: 1fr 400px 400px;
     padding: 10px 16px;
     gap: 10px;
   }
@@ -1373,7 +1395,7 @@ body {
 
 @media (max-width: 1440px) {
   .main {
-    grid-template-columns: 1fr 400px 320px;
+    grid-template-columns: 1fr 360px 400px;
     padding: 10px 12px;
     gap: 10px;
   }
@@ -1384,7 +1406,7 @@ body {
 
 @media (max-width: 1280px) {
   .main {
-    grid-template-columns: 1fr 380px 300px;
+    grid-template-columns: 1fr 340px 380px;
     padding: 8px 10px;
     gap: 8px;
   }
@@ -1396,7 +1418,7 @@ body {
 
 @media (max-width: 1100px) {
   .main {
-    grid-template-columns: 1fr 360px;
+    grid-template-columns: 1fr 380px;
     grid-template-rows: auto auto;
     height: auto;
     overflow: visible;
@@ -1634,68 +1656,59 @@ body {
           <span class="label">Tỷ lệ ký quỹ</span>
           <span class="value green">40,00%</span>
         </div>
-        <div class="account-row">
-          <span class="label">Tài sản ròng (NAV)</span>
-          <span class="value">10.700.000.000</span>
-        </div>
-        <div class="account-row">
-          <span class="label">Tiền mặt</span>
-          <span class="value">500.000.000</span>
-        </div>
       </div>
     </div>
 
     <!-- Order form -->
     <div class="panel">
       <div class="order-form-panel">
-        <!-- Row 1: Mã CK + Loại lệnh -->
-        <div class="form-row-2col">
-          <div class="form-group">
-            <div class="input-with-icon">
-              <span class="input-icon">🔍</span>
-              <input type="text" id="formSymbolInput" value="SHS" readonly>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="input-with-icon">
-              <span class="input-icon">ⓘ</span>
-              <select id="orderTypeSelect">
-                <option value="LO" selected>Lệnh LO</option>
-                <option value="MTL">Lệnh MTL</option>
-                <option value="ATO">Lệnh ATO</option>
-                <option value="ATC">Lệnh ATC</option>
-                <option value="DK">Lệnh điều kiện</option>
-              </select>
-            </div>
+        <!-- Loại lệnh -->
+        <div class="form-row-labeled">
+          <span class="form-label">Loại lệnh <span class="info-icon" title="Loại lệnh giao dịch">ⓘ</span></span>
+          <div class="input-with-icon">
+            <select id="orderTypeSelect">
+              <option value="LO" selected>Lệnh thường</option>
+              <option value="MTL">Lệnh MTL</option>
+              <option value="ATO">Lệnh ATO</option>
+              <option value="ATC">Lệnh ATC</option>
+              <option value="DK">Lệnh điều kiện</option>
+            </select>
           </div>
         </div>
 
-        <!-- Row 2: KL + Giá -->
-        <div class="form-row-2col">
+        <!-- Khối lượng -->
+        <div class="form-row-labeled">
+          <span class="form-label">Khối lượng</span>
           <div class="input-with-controls">
             <button onclick="adjustQty(-100)">−</button>
-            <input type="number" id="qtyInput" placeholder="Khối lượng" step="100">
+            <input type="number" id="qtyInput" placeholder="Nhập khối lượng" step="100">
             <button onclick="adjustQty(100)">+</button>
           </div>
+        </div>
+
+        <!-- Giá mua -->
+        <div class="form-row-labeled">
+          <span class="form-label">Giá mua</span>
           <div class="input-with-controls">
             <button onclick="adjustPrice(-0.1)">−</button>
-            <input type="number" id="priceInput" placeholder="Giá đặt" step="0.05">
+            <input type="number" id="priceInput" placeholder="Nhập giá" step="0.05">
             <button onclick="adjustPrice(0.1)">+</button>
           </div>
         </div>
 
-        <!-- Row 3: Chip -->
+        <!-- Chips: LO + MTL + ATO + ATC -->
         <div class="order-type-chips" id="orderTypeChips">
+          <div class="chip active" data-type="LO">LO</div>
           <div class="chip" data-type="MTL">MTL</div>
           <div class="chip" data-type="ATO">ATO</div>
           <div class="chip" data-type="ATC">ATC</div>
         </div>
 
-        <!-- Giá trị lệnh -->
-        <div class="order-value">
-          <span class="label">Giá trị lệnh</span>
-          <span class="value" id="orderValue">— VND</span>
-        </div>
+        <!-- Checkbox -->
+        <label class="checkbox-row">
+          <input type="checkbox" id="saveLastOrder">
+          <span>Lưu thông tin lệnh đặt gần nhất</span>
+        </label>
 
         <!-- MUA / BÁN -->
         <div class="action-buttons">
@@ -1706,20 +1719,20 @@ body {
         <!-- Tối đa -->
         <div class="max-row">
           <div class="max-info-line buy">
-            <span>Tối đa</span>
+            <span>Mua tối đa:</span>
             <strong id="maxBuy">— CP</strong>
           </div>
           <div class="max-info-line sell">
-            <span>Tối đa</span>
+            <span>Bán tối đa:</span>
             <strong id="maxSell">— CP</strong>
           </div>
         </div>
 
-        <!-- Checkbox -->
-        <label class="checkbox-row">
-          <input type="checkbox" id="saveLastOrder">
-          <span>Lưu thông tin lệnh đặt gần nhất</span>
-        </label>
+        <!-- Giá trị lệnh -->
+        <div class="order-value">
+          <span class="label">Giá trị lệnh:</span>
+          <span class="value" id="orderValue">— VND</span>
+        </div>
       </div>
     </div>
 
