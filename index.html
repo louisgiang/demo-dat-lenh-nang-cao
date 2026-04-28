@@ -1011,11 +1011,17 @@ body {
   display: flex;
   gap: 8px;
   margin-bottom: 10px;
+  align-items: stretch;
+}
+
+.account-select .customer-select-wrap {
+  flex: 1;
+  min-width: 0;
 }
 
 .account-select select {
-  flex: 1;
-  padding: 8px 10px;
+  flex: 0 0 110px;
+  padding: 8px 8px;
   border: 1px solid var(--border-input);
   border-radius: 6px;
   background: var(--bg-input);
@@ -1064,7 +1070,7 @@ body {
 
 .customer-select-btn {
   width: 100%;
-  padding: 8px 28px 8px 10px;
+  padding: 8px 10px;
   border: 1px solid var(--border-input);
   border-radius: 6px;
   background: var(--bg-input);
@@ -1077,6 +1083,16 @@ body {
   justify-content: space-between;
   align-items: center;
   font-family: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.customer-select-btn > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
 }
 
 .customer-select-btn:disabled {
@@ -1126,6 +1142,11 @@ body {
   cursor: pointer;
   border-top: 1px solid var(--border);
   transition: background 0.1s;
+  font-size: 12px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .customer-item:hover { background: var(--bg-hover); }
@@ -1133,13 +1154,16 @@ body {
 .customer-item .cust-code {
   font-weight: 700;
   color: var(--text-primary);
-  font-size: 12px;
 }
 
 .customer-item .cust-name {
-  color: var(--text-muted);
+  color: var(--text-secondary);
+}
+
+/* Customer-specific chip styling — wider chips for "code - name" */
+.customer-dropdown .search-chip {
   font-size: 11px;
-  margin-top: 2px;
+  padding: 4px 10px;
 }
 
 /* ============================================
@@ -2902,19 +2926,23 @@ function getCustomerByCode(code) {
 }
 
 function renderCustomerDropdown() {
-  // Recent chips
+  // Recent chips: "xxxxxx - Họ tên"
   const chipsWrap = document.getElementById('customerRecentChips');
-  const validRecents = recentCustomers.filter(c => getCustomerByCode(c));
+  const validRecents = recentCustomers
+    .filter(c => getCustomerByCode(c))
+    .slice(0, 5);
   chipsWrap.innerHTML = validRecents.length
-    ? validRecents.map(code => `<div class="search-chip" data-code="${code}">${code}</div>`).join('')
+    ? validRecents.map(code => {
+        const c = getCustomerByCode(code);
+        return `<div class="search-chip" data-code="${code}">${c.code} - ${c.name}</div>`;
+      }).join('')
     : `<div style="font-size: 11px; color: var(--text-muted); padding: 2px;">Chưa có</div>`;
 
-  // List of managed customers
+  // List of managed customers — single line "xxxxxx - Họ tên"
   const listEl = document.getElementById('customerList');
   listEl.innerHTML = customers.map(c => `
     <div class="customer-item" data-code="${c.code}">
-      <div class="cust-code">${c.code}</div>
-      <div class="cust-name">${c.name}</div>
+      <span class="cust-code">${c.code}</span> - <span class="cust-name">${c.name}</span>
     </div>
   `).join('');
 
