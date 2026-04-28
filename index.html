@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SH Smart Web — Đặt lệnh (Prototype UAT)</title>
+<style>
+/* ============================================
+   CSS VARIABLES - LIGHT & DARK THEME
+   ============================================ */
+:root {
+  /* Light theme defaults */
+  --bg-page: #f5f7fa;
+  --bg-panel: #ffffff;
+  --bg-panel-alt: #f7fafc;
+  --bg-input: #ffffff;
+  --bg-hover: #edf2f7;
+  --bg-header: #ffffff;
+  --bg-decision: #fefcbf;
+  --bg-decision-border: #d69e2e;
+
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  --text-inverse: #ffffff;
+
+  --border: #e2e8f0;
+  --border-strong: #cbd5e0;
+  --border-input: #cbd5e0;
+
+  --color-buy: #16a34a;
+  --color-buy-bg: #dcfce7;
+  --color-buy-bg-light: #f0fdf4;
+  --color-sell: #dc2626;
+  --color-sell-bg: #fee2e2;
+  --color-sell-bg-light: #fef2f2;
+  --color-ref: #ea580c;
+  --color-floor: #06b6d4;
+  --color-ceiling: #a855f7;
+
+  --color-primary: #1a365d;
+  --color-primary-light: #fff5f0;
+  --color-accent: #ed8936;
+  --color-accent-text: #c05621;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+  --shadow-modal: 0 25px 50px -12px rgba(0,0,0,0.25);
+}
+
+[data-theme="dark"] {
+  --bg-page: #0a0e1a;
+  --bg-panel: #161b2c;
+  --bg-panel-alt: #1f2538;
+  --bg-input: #0f1320;
+  --bg-hover: #2a3148;
+  --bg-header: #0a0e1a;
+  --bg-decision: #4a3a0c;
+  --bg-decision-border: #fbbf24;
+
+  --text-primary: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-inverse: #0a0e1a;
+
+  --border: #2a3148;
+  --border-strong: #475569;
+  --border-input: #475569;
+
+  --color-buy: #00e676;
+  --color-buy-bg: #003d20;
+  --color-buy-bg-light: #001a0e;
+  --color-sell: #ff5252;
+  --color-sell-bg: #4a0e0e;
+  --color-sell-bg-light: #2a0606;
+  --color-ref: #ffa726;
+  --color-floor: #00e5ff;
+  --color-ceiling: #e040fb;
+
+  --color-primary: #4f8eff;
+  --color-primary-light: #1e3a8a;
+  --color-accent: #ffa726;
+  --color-accent-text: #ffb74d;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow: 0 1px 3px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.7);
+  --shadow-modal: 0 25px 50px -12px rgba(0,0,0,0.9);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.header {
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--color-accent-text);
+}
+
+.logo-mark {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #f97316 100%);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 900;
+}
+
+.nav {
+  display: flex;
+  gap: 4px;
+}
+
+.nav a {
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+
+.nav a.active {
+  color: var(--color-accent-text);
+  background: var(--color-primary-light);
+}
+
+.nav a:hover:not(.active) {
+  background: var(--bg-hover);
+}
+
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-search {
+  position: relative;
+  width: 240px;
+}
+
+.header-search input {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  border: 1px solid var(--border-input);
+  border-radius: 6px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.header-search::before {
+  content: "🔍";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+
+.icon-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.theme-toggle {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--border);
+  cursor: pointer;
+  border: none;
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+
+.theme-toggle::before {
+  content: "☀️";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: transform 0.3s, background 0.3s;
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .theme-toggle::before {
+  content: "🌙";
+  transform: translateX(28px);
+}
+
+/* ============================================
+   MARKET TICKER
+   ============================================ */
+.ticker {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 24px;
+  display: flex;
+  gap: 24px;
+  font-size: 12px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.ticker-item {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.ticker-item .symbol {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ticker-item .price {
+  font-weight: 600;
+}
+
+.ticker-item .change {
+  font-size: 11px;
+}
+
+.up { color: var(--color-buy); }
+.down { color: var(--color-sell); }
+.ref { color: var(--color-ref); }
+
+/* ============================================
+   MAIN GRID
+   ============================================ */
+.main {
+  display: grid;
+  grid-template-columns: 1fr 480px 380px;
+  gap: 12px;
+  padding: 12px 24px;
+  height: calc(100vh - 65px);
+  overflow: hidden;
+}
+
+.col-left, .col-mid, .col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================
+   CHART AREA
+   ============================================ */
+.chart-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.chart-toolbar {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.chart-symbol {
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.chart-tools {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.chart-tools button {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.chart-tools button:hover { background: var(--bg-hover); }
+
+.chart-info {
+  padding: 8px 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.chart-info span { margin-right: 14px; }
+.chart-info .lbl { color: var(--text-muted); }
+.chart-info .val { color: var(--text-primary); font-weight: 600; }
+
+.chart-area {
+  flex: 1;
+  position: relative;
+  padding: 12px;
+  min-height: 200px;
+  overflow: hidden;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.chart-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.chart-tabs button {
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.chart-tabs button.active {
+  background: var(--color-primary-light);
+  color: var(--color-accent-text);
+  font-weight: 600;
+}
+
+/* ============================================
+   ORDER LIST
+   ============================================ */
+.orders-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+}
+
+.orders-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.orders-tabs button {
+  padding: 12px 18px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+.orders-tabs button.active {
+  color: var(--color-accent-text);
+  border-bottom-color: var(--color-accent);
+  font-weight: 600;
+}
+
+.orders-tabs button:hover:not(.active) {
+  color: var(--text-primary);
+}
+
+.orders-filter {
+  padding: 10px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.orders-filter input,
+.orders-filter select {
+  padding: 6px 10px;
+  border: 1px solid var(--border-input);
+  border-radius: 4px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+.orders-filter input { flex: 1; max-width: 200px; }
+
+.btn-cancel-all {
+  margin-left: auto;
+  padding: 6px 14px;
+  border: 1px solid var(--color-sell);
+  background: transparent;
+  color: var(--color-sell);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn-cancel-all:hover {
+  background: var(--color-sell-bg-light);
+}
+
+.orders-table-wrap {
+  flex: 1;
+  overflow: auto;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.orders-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-panel-alt);
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 11px;
+  border-bottom: 1px solid var(--border);
+  z-index: 1;
+}
+
+.orders-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.orders-table .total-row {
+  background: var(--bg-panel-alt);
+  font-weight: 600;
+}
+
+.orders-table tr:hover:not(.total-row) {
+  background: var(--bg-hover);
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.status-waiting { background: #fef3c7; color: #92400e; }
+.status-partial { background: #dbeafe; color: #1e40af; }
+.status-filled { background: #dcfce7; color: #166534; }
+.status-cancelled { background: #f3f4f6; color: #6b7280; }
+
+[data-theme="dark"] .status-waiting { background: #78350f; color: #fde68a; }
+[data-theme="dark"] .status-partial { background: #1e3a8a; color: #bfdbfe; }
+[data-theme="dark"] .status-filled { background: #14532d; color: #86efac; }
+[data-theme="dark"] .status-cancelled { background: #1e293b; color: #cbd5e1; }
+
+.action-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.action-btns button {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+
+.action-btns button:hover { background: var(--bg-hover); }
+.action-btns .delete:hover { background: var(--color-sell-bg-light); color: var(--color-sell); border-color: var(--color-sell); }
+
+/* ============================================
+   MID COLUMN - ORDERBOOK & MATCHES
+   ============================================ */
+.orderbook-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.orderbook-header {
+  padding: 10px 14px;
+  display: grid;
+  grid-template-columns: 1fr 80px 80px 1fr;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-panel-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.orderbook-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px 1fr;
+  padding: 10px 14px;
+  font-size: 13px;
+  align-items: center;
+  font-weight: 600;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.orderbook-row:hover {
+  background: var(--bg-hover);
+}
+
+.ob-bid-vol, .ob-bid-price {
+  background: var(--color-buy-bg-light);
+}
+
+.ob-ask-vol, .ob-ask-price {
+  background: var(--color-sell-bg-light);
+}
+
+.ob-bid-price { color: var(--color-buy); }
+.ob-ask-price { color: var(--color-sell); }
+
+.ob-bid-vol { text-align: right; padding-right: 14px; }
+.ob-bid-price { text-align: right; padding-right: 14px; }
+.ob-ask-price { text-align: left; padding-left: 14px; }
+.ob-ask-vol { text-align: left; padding-left: 14px; }
+
+.flash-up { animation: flashUp 0.6s ease; }
+.flash-down { animation: flashDown 0.6s ease; }
+
+@keyframes flashUp {
+  0% { background: var(--color-buy); color: white; }
+  100% { background: var(--color-buy-bg-light); }
+}
+
+@keyframes flashDown {
+  0% { background: var(--color-sell); color: white; }
+  100% { background: var(--color-sell-bg-light); }
+}
+
+.ratio-section {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.ratio-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+
+.ratio-bar .buy-bar { background: var(--color-buy); transition: width 0.5s ease; }
+.ratio-bar .sell-bar { background: var(--color-sell); transition: width 0.5s ease; }
+
+.ratio-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.ratio-text .buy-pct { color: var(--color-buy); font-weight: 700; }
+.ratio-text .sell-pct { color: var(--color-sell); font-weight: 700; }
+
+.ratio-label {
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Recent matches */
+.matches-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.matches-header {
+  padding: 10px 14px;
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr 80px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-panel-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.matches-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.match-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr 80px;
+  padding: 8px 14px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+
+.match-side-buy {
+  color: var(--color-buy);
+  font-weight: 600;
+}
+
+.match-side-sell {
+  color: var(--color-sell);
+  font-weight: 600;
+}
+
+.match-side-buy .pill,
+.match-side-sell .pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+}
+
+.match-side-buy .pill { background: var(--color-buy-bg); color: var(--color-buy); }
+.match-side-sell .pill { background: var(--color-sell-bg); color: var(--color-sell); }
+
+.new-match { animation: slideIn 0.4s ease; }
+
+@keyframes slideIn {
+  0% { opacity: 0; transform: translateY(-10px); background: var(--color-primary-light); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   RIGHT COLUMN - SYMBOL INFO + ORDER FORM
+   ============================================ */
+.symbol-info-panel {
+  padding: 14px;
+}
+
+.symbol-search-wrap {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.symbol-search {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid var(--border-input);
+  border-radius: 6px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.symbol-search-wrap::before {
+  content: "🔍";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  opacity: 0.5;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  max-height: 280px;
+  overflow-y: auto;
+  display: none;
+}
+
+.search-dropdown.open { display: block; }
+
+.search-dropdown-header {
+  padding: 8px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--bg-panel-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.search-result {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.search-result:hover {
+  background: var(--bg-hover);
+}
+
+.search-result:last-child { border-bottom: none; }
+
+.search-result .result-symbol {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.search-result .result-name {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.symbol-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.symbol-price .big-price {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.symbol-price .change {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.symbol-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.meta-item {
+  text-align: center;
+}
+
+.meta-item .meta-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.meta-item .meta-value {
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.meta-item.ceiling .meta-value { color: var(--color-ceiling); }
+.meta-item.floor .meta-value { color: var(--color-floor); }
+.meta-item.ref .meta-value { color: var(--color-ref); }
+
+/* Account info */
+.account-info-panel {
+  padding: 14px;
+  background: var(--bg-panel);
+}
+
+.account-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 12px;
+}
+
+.account-row + .account-row {
+  border-top: 1px solid var(--border);
+}
+
+.account-row .label {
+  color: var(--text-muted);
+}
+
+.account-row .value {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.account-row .value.green { color: var(--color-buy); }
+
+.account-select {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.account-select select {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--border-input);
+  border-radius: 6px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+/* ============================================
+   ORDER FORM
+   ============================================ */
+.order-form-panel {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-input);
+  border-radius: 6px;
+  background: var(--bg-input);
+  overflow: hidden;
+}
+
+.input-with-icon .input-icon {
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.input-with-icon input,
+.input-with-icon select {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 8px 10px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  outline: none;
+  width: 100%;
+}
+
+.input-with-icon select {
+  padding-right: 8px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2394a3b8' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.order-type-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.chip {
+  padding: 6px 18px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-panel);
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+
+.chip:hover { background: var(--bg-hover); }
+
+.chip.active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: white;
+  font-weight: 700;
+}
+
+.input-with-controls {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-input);
+  border-radius: 6px;
+  background: var(--bg-input);
+  overflow: hidden;
+}
+
+.input-with-controls button {
+  width: 36px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: background 0.15s;
+}
+
+.input-with-controls button:hover { background: var(--bg-hover); }
+
+.input-with-controls input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  outline: none;
+  width: 100%;
+}
+
+.input-with-controls input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.order-value {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg-panel-alt);
+  border-radius: 6px;
+  font-size: 12px;
+  align-items: center;
+}
+
+.order-value .label { color: var(--text-secondary); }
+.order-value .value { font-weight: 700; color: var(--text-primary); font-size: 13px; }
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn-buy, .btn-sell {
+  padding: 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  color: white;
+  transition: all 0.15s;
+  letter-spacing: 0.5px;
+}
+
+.btn-buy {
+  background: var(--color-buy);
+}
+
+.btn-buy:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .btn-buy:hover { background: #00c853; }
+
+.btn-sell {
+  background: var(--color-sell);
+}
+
+.btn-sell:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .btn-sell:hover { background: #ff1744; }
+
+.max-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.max-info-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 4px 6px;
+}
+
+.max-info-line.buy { color: var(--color-buy); }
+.max-info-line.sell { color: var(--color-sell); }
+
+.max-info-line strong {
+  font-weight: 700;
+}
+
+.quick-info-panel {
+  padding: 14px;
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.quick-actions button {
+  padding: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-panel);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+
+.quick-actions button:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+/* ============================================
+   MODAL CONFIRM
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg-panel);
+  border-radius: 12px;
+  width: 480px;
+  max-width: 90vw;
+  box-shadow: var(--shadow-modal);
+  animation: scaleIn 0.2s ease;
+  overflow: hidden;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.modal-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.modal-header.buy {
+  background: var(--color-buy-bg-light);
+  border-bottom-color: var(--color-buy);
+}
+
+.modal-header.sell {
+  background: var(--color-sell-bg-light);
+  border-bottom-color: var(--color-sell);
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  color: var(--text-muted);
+  border-radius: 4px;
+}
+
+.modal-close:hover { background: var(--bg-hover); }
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.detail-block .detail-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.detail-block .detail-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.detail-block .detail-value.buy { color: var(--color-buy); }
+.detail-block .detail-value.sell { color: var(--color-sell); }
+
+.modal-summary {
+  padding: 16px;
+  background: var(--bg-panel-alt);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.modal-summary .summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+.modal-summary .summary-row.total {
+  font-size: 16px;
+  font-weight: 700;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+  padding-top: 12px;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.btn-secondary:hover { background: var(--bg-hover); }
+
+.btn-primary {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+}
+
+.btn-primary.buy { background: var(--color-buy); }
+.btn-primary.buy:hover { background: #15803d; }
+.btn-primary.sell { background: var(--color-sell); }
+.btn-primary.sell:hover { background: #b91c1c; }
+
+/* ============================================
+   TOAST
+   ============================================ */
+.toast-container {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 14px 20px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--color-buy);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  min-width: 320px;
+  animation: toastIn 0.3s ease;
+}
+
+.toast.error {
+  border-left-color: var(--color-sell);
+}
+
+.toast .toast-icon {
+  font-size: 20px;
+}
+
+.toast .toast-content strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text-primary);
+}
+
+.toast .toast-content span {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+@keyframes toastIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes toastOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(120%); opacity: 0; }
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Hidden helpers */
+.hidden { display: none !important; }
+</style>
+</head>
+<body data-theme="light">
+
+<!-- ============================================ HEADER ============================================ -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-mark">S</div>
+    <span>SH Smart</span>
+  </div>
+  <nav class="nav">
+    <a href="#">Bảng giá</a>
+    <a href="#">Thị trường</a>
+    <a href="#" class="active">Giao dịch</a>
+    <a href="#">Tài sản</a>
+    <a href="#">Tài khoản</a>
+    <a href="#">Báo cáo</a>
+  </nav>
+  <div class="header-right">
+    <div class="header-search">
+      <input type="text" placeholder="Tìm kiếm...">
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+    <button class="icon-btn" title="Thông báo">🔔</button>
+    <button class="icon-btn" title="Cài đặt">⚙️</button>
+    <button class="icon-btn" title="Tài khoản">👤</button>
+  </div>
+</div>
+
+<!-- ============================================ MAIN ============================================ -->
+<div class="main">
+
+  <!-- ===== LEFT COLUMN: Chart + Orders ===== -->
+  <div class="col-left">
+
+    <!-- Chart panel -->
+    <div class="panel chart-panel">
+      <div class="chart-toolbar">
+        <span class="chart-symbol" id="chartSymbol">SHS</span>
+        <span style="color: var(--text-muted); font-size: 11px;">D · HNX</span>
+        <div class="chart-tools">
+          <button>So sánh</button>
+          <button>Chỉ báo</button>
+          <button>Lưu</button>
+          <button>⚙</button>
+          <button>📷</button>
+        </div>
+      </div>
+      <div class="chart-info">
+        <span class="chart-name" id="chartName">Cổ phiếu CTCP Chứng khoán Sài Gòn - Hà Nội · 1D · HNX</span>
+      </div>
+      <div class="chart-area">
+        <svg class="chart-svg" id="chartSvg" viewBox="0 0 800 280" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="chart-tabs">
+        <button class="active">5n</button>
+        <button>1n</button>
+        <button>6n</button>
+        <button>3n</button>
+        <button>5n</button>
+        <button>1n</button>
+      </div>
+    </div>
+
+    <!-- Orders panel -->
+    <div class="panel orders-panel">
+      <div class="orders-tabs">
+        <button class="active">Lệnh chờ khớp</button>
+        <button>Lệnh đã thực hiện</button>
+        <button>Lệnh đặt trước</button>
+        <button>Lệnh điều kiện</button>
+        <button>Danh mục nắm giữ</button>
+      </div>
+      <div class="orders-filter">
+        <input type="text" placeholder="Tìm kiếm mã...">
+        <select>
+          <option>Tất cả loại lệnh</option>
+          <option>Mua</option>
+          <option>Bán</option>
+        </select>
+        <select>
+          <option>Tất cả trạng thái</option>
+          <option>Chờ khớp</option>
+          <option>Khớp một phần</option>
+          <option>Đã hủy</option>
+        </select>
+        <button class="btn-cancel-all">Hủy tất cả</button>
+      </div>
+      <div class="orders-table-wrap">
+        <table class="orders-table" id="ordersTable">
+          <thead>
+            <tr>
+              <th><input type="checkbox"></th>
+              <th>Lệnh</th>
+              <th>Mã CK</th>
+              <th>KL đặt</th>
+              <th>Giá đặt</th>
+              <th>KL khớp</th>
+              <th>Giá khớp</th>
+              <th>KL chờ khớp</th>
+              <th>GT đã khớp</th>
+              <th>Trạng thái</th>
+              <th>Thời gian</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody">
+            <tr class="total-row">
+              <td colspan="3"><strong>Tổng cộng</strong></td>
+              <td id="totalKlDat">1.000.000</td>
+              <td>—</td>
+              <td id="totalKlKhop">300.000</td>
+              <td>—</td>
+              <td id="totalKlCho">700.000</td>
+              <td id="totalGtKhop">3.000.000.000</td>
+              <td colspan="3"></td>
+            </tr>
+            <!-- Sample orders will be added by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== MID COLUMN: Orderbook + Recent Matches ===== -->
+  <div class="col-mid">
+
+    <!-- Orderbook -->
+    <div class="panel orderbook-panel">
+      <div class="orderbook-header">
+        <div style="text-align: right; padding-right: 14px;">Khối lượng</div>
+        <div style="text-align: right; padding-right: 14px;">Mua</div>
+        <div style="text-align: left; padding-left: 14px;">Bán</div>
+        <div style="text-align: left; padding-left: 14px;">Khối lượng</div>
+      </div>
+      <div id="orderbookRows">
+        <!-- 3 rows generated by JS -->
+      </div>
+      <div class="ratio-section">
+        <div class="ratio-text">
+          <span class="buy-pct" id="ratioBuy">60,00%</span>
+          <span class="sell-pct" id="ratioSell">40,00%</span>
+        </div>
+        <div class="ratio-bar">
+          <div class="buy-bar" id="ratioBuyBar" style="width: 60%;"></div>
+          <div class="sell-bar" id="ratioSellBar" style="width: 40%;"></div>
+        </div>
+        <div class="ratio-label">Tỷ lệ Cầu / Cung của mã</div>
+      </div>
+    </div>
+
+    <!-- Recent matches -->
+    <div class="panel matches-panel">
+      <div class="matches-header">
+        <div>Thời gian</div>
+        <div>Mua/Bán</div>
+        <div>Khối lượng</div>
+        <div>Giá</div>
+      </div>
+      <div class="matches-list" id="matchesList">
+        <!-- Generated by JS -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== RIGHT COLUMN: Symbol Info + Order Form ===== -->
+  <div class="col-right">
+
+    <!-- Symbol search & info -->
+    <div class="panel symbol-info-panel">
+      <div class="symbol-search-wrap">
+        <input type="text" class="symbol-search" id="symbolSearch" placeholder="Tìm mã chứng khoán..." autocomplete="off">
+        <div class="search-dropdown" id="searchDropdown">
+          <div class="search-dropdown-header">Gợi ý</div>
+          <div id="searchResults"></div>
+        </div>
+      </div>
+
+      <div class="symbol-price">
+        <span class="big-price" id="bigPrice">18,40</span>
+        <span class="change down" id="bigChange">▼ 0,10 -0,54%</span>
+      </div>
+      <div style="font-size: 11px; color: var(--text-muted);" id="bigName">SHS · Cổ phiếu CTCP Chứng khoán Sài Gòn - Hà Nội</div>
+
+      <div class="symbol-meta">
+        <div class="meta-item ceiling">
+          <div class="meta-label">Trần</div>
+          <div class="meta-value" id="metaCeiling">20,30</div>
+        </div>
+        <div class="meta-item floor">
+          <div class="meta-label">Sàn</div>
+          <div class="meta-value" id="metaFloor">16,30</div>
+        </div>
+        <div class="meta-item ref">
+          <div class="meta-label">TC</div>
+          <div class="meta-value" id="metaRef">18,50</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">KLGD</div>
+          <div class="meta-value" id="metaVolume">2.5M</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account info (combined) -->
+    <div class="panel">
+      <div class="account-info-panel">
+        <div class="account-select">
+          <select>
+            <option>000000 - Nguyễn Văn A</option>
+          </select>
+          <select>
+            <option>Tiểu khoản 01</option>
+          </select>
+        </div>
+        <div class="account-row">
+          <span class="label">Sức mua</span>
+          <span class="value">1.000.000.000 VND</span>
+        </div>
+        <div class="account-row">
+          <span class="label">HM ưu đãi khả dụng</span>
+          <span class="value">500.000.000</span>
+        </div>
+        <div class="account-row">
+          <span class="label">Tỷ lệ ký quỹ</span>
+          <span class="value green">40,00%</span>
+        </div>
+        <div class="account-row">
+          <span class="label">Tài sản ròng (NAV)</span>
+          <span class="value">10.700.000.000</span>
+        </div>
+        <div class="account-row">
+          <span class="label">Tiền mặt</span>
+          <span class="value">500.000.000</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order form -->
+    <div class="panel">
+      <div class="order-form-panel">
+        <!-- Row 1: Mã CK + Loại lệnh -->
+        <div class="form-row-2col">
+          <div class="form-group">
+            <div class="input-with-icon">
+              <span class="input-icon">🔍</span>
+              <input type="text" id="formSymbolInput" value="SHS" readonly>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-with-icon">
+              <span class="input-icon">ⓘ</span>
+              <select id="orderTypeSelect">
+                <option value="LO" selected>Lệnh LO</option>
+                <option value="MTL">Lệnh MTL</option>
+                <option value="ATO">Lệnh ATO</option>
+                <option value="ATC">Lệnh ATC</option>
+                <option value="DK">Lệnh điều kiện</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: KL + Giá -->
+        <div class="form-row-2col">
+          <div class="input-with-controls">
+            <button onclick="adjustQty(-100)">−</button>
+            <input type="number" id="qtyInput" placeholder="Khối lượng" step="100">
+            <button onclick="adjustQty(100)">+</button>
+          </div>
+          <div class="input-with-controls">
+            <button onclick="adjustPrice(-0.1)">−</button>
+            <input type="number" id="priceInput" placeholder="Giá đặt" step="0.05">
+            <button onclick="adjustPrice(0.1)">+</button>
+          </div>
+        </div>
+
+        <!-- Row 3: Chip -->
+        <div class="order-type-chips" id="orderTypeChips">
+          <div class="chip" data-type="MTL">MTL</div>
+          <div class="chip" data-type="ATO">ATO</div>
+          <div class="chip" data-type="ATC">ATC</div>
+        </div>
+
+        <!-- Giá trị lệnh -->
+        <div class="order-value">
+          <span class="label">Giá trị lệnh</span>
+          <span class="value" id="orderValue">— VND</span>
+        </div>
+
+        <!-- MUA / BÁN -->
+        <div class="action-buttons">
+          <button class="btn-buy" onclick="openConfirmModal('BUY')">MUA</button>
+          <button class="btn-sell" onclick="openConfirmModal('SELL')">BÁN</button>
+        </div>
+
+        <!-- Tối đa -->
+        <div class="max-row">
+          <div class="max-info-line buy">
+            <span>Tối đa</span>
+            <strong id="maxBuy">— CP</strong>
+          </div>
+          <div class="max-info-line sell">
+            <span>Tối đa</span>
+            <strong id="maxSell">— CP</strong>
+          </div>
+        </div>
+
+        <!-- Checkbox -->
+        <label class="checkbox-row">
+          <input type="checkbox" id="saveLastOrder">
+          <span>Lưu thông tin lệnh đặt gần nhất</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Account quick info + Quick actions -->
+    <div class="panel">
+      <div class="quick-info-panel">
+        <div class="account-row">
+          <span class="label">Tài sản ròng (NAV)</span>
+          <span class="value">10.700.000.000</span>
+        </div>
+        <div class="account-row">
+          <span class="label">Tiền mặt</span>
+          <span class="value">500.000.000</span>
+        </div>
+        <div class="quick-actions">
+          <button>Chuyển tiền</button>
+          <button>Nộp tiền</button>
+          <button>Rút tiền</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ============================================ MODAL CONFIRM ============================================ -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-header" id="modalHeader">
+      <h3 id="modalTitle">Xác nhận đặt lệnh</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-detail">
+        <div class="detail-block">
+          <div class="detail-label">Loại lệnh</div>
+          <div class="detail-value" id="confirmSide">MUA</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Mã CK</div>
+          <div class="detail-value" id="confirmSymbol">SHS</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Khối lượng</div>
+          <div class="detail-value" id="confirmQty">0</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Giá đặt</div>
+          <div class="detail-value" id="confirmPrice">0,00</div>
+        </div>
+      </div>
+      <div class="modal-summary">
+        <div class="summary-row">
+          <span>Loại lệnh:</span>
+          <span id="confirmType">LO</span>
+        </div>
+        <div class="summary-row">
+          <span>Tài khoản:</span>
+          <span>000000 - Tiểu khoản 01</span>
+        </div>
+        <div class="summary-row total">
+          <span>Tổng giá trị:</span>
+          <span id="confirmTotal">0 VND</span>
+        </div>
+      </div>
+      <p style="font-size: 11px; color: var(--text-muted); margin-top: 12px;">
+        ⓘ Vui lòng kiểm tra kỹ thông tin trước khi xác nhận. Lệnh đặt sẽ được gửi vào hệ thống ngay sau khi bấm Xác nhận.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Hủy</button>
+      <button class="btn-primary" id="confirmBtn" onclick="confirmOrder()">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ TOAST CONTAINER ============================================ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============================================ JAVASCRIPT ============================================ -->
+<script>
+// ===========================================================================
+// SYMBOLS DATA
+// ===========================================================================
+const symbols = {
+  SHS: {
+    code: 'SHS',
+    name: 'Cổ phiếu CTCP Chứng khoán Sài Gòn - Hà Nội',
+    exchange: 'HNX',
+    refPrice: 18.50,
+    floorPrice: 16.30,
+    ceilingPrice: 20.30,
+    currentPrice: 18.40,
+    change: -0.10,
+    changePct: -0.54,
+    volume: '2,5M',
+    bidPrices: [18.40, 18.30, 18.20],
+    askPrices: [18.50, 18.60, 18.70],
+    bidVolumes: [600000, 800000, 1000000],
+    askVolumes: [600000, 800000, 1000000],
+    chart: [17.10, 18.30, 17.10, 17.30, 18.10, 17.50, 18.20, 19.00, 18.80, 19.20, 18.90, 18.40]
+  },
+  HPG: {
+    code: 'HPG',
+    name: 'Cổ phiếu CTCP Tập đoàn Hòa Phát',
+    exchange: 'HOSE',
+    refPrice: 28.00,
+    floorPrice: 26.05,
+    ceilingPrice: 29.95,
+    currentPrice: 28.45,
+    change: 0.45,
+    changePct: 1.61,
+    volume: '15,2M',
+    bidPrices: [28.45, 28.40, 28.35],
+    askPrices: [28.50, 28.55, 28.60],
+    bidVolumes: [1200000, 1500000, 800000],
+    askVolumes: [950000, 1100000, 1300000],
+    chart: [27.50, 27.80, 27.60, 28.10, 28.30, 28.00, 28.20, 28.50, 28.60, 28.40, 28.50, 28.45]
+  },
+  VNM: {
+    code: 'VNM',
+    name: 'Cổ phiếu CTCP Sữa Việt Nam Vinamilk',
+    exchange: 'HOSE',
+    refPrice: 65.50,
+    floorPrice: 60.95,
+    ceilingPrice: 70.05,
+    currentPrice: 65.20,
+    change: -0.30,
+    changePct: -0.46,
+    volume: '3,8M',
+    bidPrices: [65.20, 65.10, 65.00],
+    askPrices: [65.30, 65.40, 65.50],
+    bidVolumes: [400000, 500000, 350000],
+    askVolumes: [380000, 450000, 600000],
+    chart: [66.20, 66.00, 65.80, 65.50, 65.30, 65.60, 65.40, 65.20, 65.10, 65.30, 65.20, 65.20]
+  }
+};
+
+let currentSymbol = 'SHS';
+let currentOrderType = 'LO';
+
+const formatNumber = (n) => n.toLocaleString('vi-VN');
+const formatPrice = (n) => n.toFixed(2).replace('.', ',');
+const formatVND = (n) => n.toLocaleString('vi-VN') + ' VND';
+
+// ===========================================================================
+// THEME TOGGLE
+// ===========================================================================
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', () => {
+  const current = document.body.dataset.theme;
+  document.body.dataset.theme = current === 'light' ? 'dark' : 'light';
+  // Re-render chart for new theme colors
+  renderChart();
+});
+
+// ===========================================================================
+// CHART (SVG candlestick)
+// ===========================================================================
+function renderChart() {
+  const data = symbols[currentSymbol].chart;
+  const svg = document.getElementById('chartSvg');
+  svg.innerHTML = '';
+
+  const width = 800;
+  const height = 280;
+  const padding = { top: 20, right: 60, bottom: 30, left: 10 };
+  const chartW = width - padding.left - padding.right;
+  const chartH = height - padding.top - padding.bottom;
+
+  const min = Math.min(...data) * 0.99;
+  const max = Math.max(...data) * 1.01;
+  const range = max - min;
+
+  const stepX = chartW / (data.length - 1);
+
+  // Background grid
+  for (let i = 0; i <= 4; i++) {
+    const y = padding.top + (chartH / 4) * i;
+    const price = max - (range / 4) * i;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', padding.left);
+    line.setAttribute('y1', y);
+    line.setAttribute('x2', width - padding.right);
+    line.setAttribute('y2', y);
+    line.setAttribute('stroke', 'var(--border)');
+    line.setAttribute('stroke-dasharray', '2,2');
+    svg.appendChild(line);
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', width - padding.right + 4);
+    text.setAttribute('y', y + 4);
+    text.setAttribute('fill', 'var(--text-muted)');
+    text.setAttribute('font-size', '10');
+    text.textContent = formatPrice(price);
+    svg.appendChild(text);
+  }
+
+  // Candlesticks
+  const barW = stepX * 0.5;
+  for (let i = 0; i < data.length; i++) {
+    const x = padding.left + i * stepX;
+    const open = data[Math.max(0, i - 1)];
+    const close = data[i];
+    const high = Math.max(open, close) + Math.random() * 0.3;
+    const low = Math.min(open, close) - Math.random() * 0.3;
+
+    const yOpen = padding.top + chartH - ((open - min) / range) * chartH;
+    const yClose = padding.top + chartH - ((close - min) / range) * chartH;
+    const yHigh = padding.top + chartH - ((high - min) / range) * chartH;
+    const yLow = padding.top + chartH - ((low - min) / range) * chartH;
+
+    const isUp = close >= open;
+    const color = isUp ? '#16a34a' : '#dc2626';
+
+    // Wick
+    const wick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    wick.setAttribute('x1', x);
+    wick.setAttribute('y1', yHigh);
+    wick.setAttribute('x2', x);
+    wick.setAttribute('y2', yLow);
+    wick.setAttribute('stroke', color);
+    wick.setAttribute('stroke-width', '1');
+    svg.appendChild(wick);
+
+    // Body
+    const body = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    body.setAttribute('x', x - barW / 2);
+    body.setAttribute('y', Math.min(yOpen, yClose));
+    body.setAttribute('width', barW);
+    body.setAttribute('height', Math.max(2, Math.abs(yClose - yOpen)));
+    body.setAttribute('fill', color);
+    svg.appendChild(body);
+  }
+
+  // Current price line
+  const lastPrice = symbols[currentSymbol].currentPrice;
+  const yLast = padding.top + chartH - ((lastPrice - min) / range) * chartH;
+  const priceLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  priceLine.setAttribute('x1', padding.left);
+  priceLine.setAttribute('y1', yLast);
+  priceLine.setAttribute('x2', width - padding.right);
+  priceLine.setAttribute('y2', yLast);
+  priceLine.setAttribute('stroke', 'var(--color-accent)');
+  priceLine.setAttribute('stroke-width', '1');
+  priceLine.setAttribute('stroke-dasharray', '4,2');
+  svg.appendChild(priceLine);
+
+  // Price label
+  const priceLabel = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  priceLabel.setAttribute('x', width - padding.right);
+  priceLabel.setAttribute('y', yLast - 9);
+  priceLabel.setAttribute('width', 50);
+  priceLabel.setAttribute('height', 18);
+  priceLabel.setAttribute('fill', 'var(--color-accent)');
+  priceLabel.setAttribute('rx', '3');
+  svg.appendChild(priceLabel);
+
+  const priceText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  priceText.setAttribute('x', width - padding.right + 25);
+  priceText.setAttribute('y', yLast + 4);
+  priceText.setAttribute('fill', '#fff');
+  priceText.setAttribute('font-size', '10');
+  priceText.setAttribute('font-weight', 'bold');
+  priceText.setAttribute('text-anchor', 'middle');
+  priceText.textContent = formatPrice(lastPrice);
+  svg.appendChild(priceText);
+}
+
+// ===========================================================================
+// ORDERBOOK
+// ===========================================================================
+function renderOrderbook() {
+  const sym = symbols[currentSymbol];
+  const container = document.getElementById('orderbookRows');
+  container.innerHTML = '';
+
+  for (let i = 0; i < 3; i++) {
+    const row = document.createElement('div');
+    row.className = 'orderbook-row';
+    row.innerHTML = `
+      <div class="ob-bid-vol" data-key="bv-${i}">${formatNumber(sym.bidVolumes[i])}</div>
+      <div class="ob-bid-price" data-key="bp-${i}">${formatPrice(sym.bidPrices[i])}</div>
+      <div class="ob-ask-price" data-key="ap-${i}">${formatPrice(sym.askPrices[i])}</div>
+      <div class="ob-ask-vol" data-key="av-${i}">${formatNumber(sym.askVolumes[i])}</div>
+    `;
+    // Click to fill price
+    row.querySelector('[data-key^="bp-"]').addEventListener('click', () => fillPrice(sym.bidPrices[i]));
+    row.querySelector('[data-key^="ap-"]').addEventListener('click', () => fillPrice(sym.askPrices[i]));
+    container.appendChild(row);
+  }
+}
+
+// Tick simulation - update prices every 1.5s
+function tickPrices() {
+  const sym = symbols[currentSymbol];
+  const tickSize = sym.currentPrice >= 50 ? 0.05 : sym.currentPrice >= 10 ? 0.05 : 0.01;
+
+  // Update bid[0] and ask[0] only - the other rows are derived from these
+  const bidDelta = (Math.random() - 0.5) * 2;
+  const askDelta = (Math.random() - 0.5) * 2;
+
+  let oldBid0 = sym.bidPrices[0];
+  let oldAsk0 = sym.askPrices[0];
+
+  if (Math.abs(bidDelta) > 0.4) {
+    const change = bidDelta > 0 ? tickSize : -tickSize;
+    let newBid0 = +(oldBid0 + change).toFixed(2);
+    // bid[0] phải < ask[0]
+    if (newBid0 < sym.askPrices[0] && newBid0 >= sym.floorPrice) {
+      sym.bidPrices[0] = newBid0;
+    }
+  }
+  if (Math.abs(askDelta) > 0.4) {
+    const change = askDelta > 0 ? tickSize : -tickSize;
+    let newAsk0 = +(oldAsk0 + change).toFixed(2);
+    // ask[0] phải > bid[0]
+    if (newAsk0 > sym.bidPrices[0] && newAsk0 <= sym.ceilingPrice) {
+      sym.askPrices[0] = newAsk0;
+    }
+  }
+
+  // Derive bid[1], bid[2] (cao -> thấp): mỗi level cách nhau 1 tick
+  sym.bidPrices[1] = +(sym.bidPrices[0] - tickSize).toFixed(2);
+  sym.bidPrices[2] = +(sym.bidPrices[0] - tickSize * 2).toFixed(2);
+
+  // Derive ask[1], ask[2] (thấp -> cao)
+  sym.askPrices[1] = +(sym.askPrices[0] + tickSize).toFixed(2);
+  sym.askPrices[2] = +(sym.askPrices[0] + tickSize * 2).toFixed(2);
+
+  // Update DOM with flash animation
+  for (let i = 0; i < 3; i++) {
+    const bpEl = document.querySelector(`[data-key="bp-${i}"]`);
+    const apEl = document.querySelector(`[data-key="ap-${i}"]`);
+    const bvEl = document.querySelector(`[data-key="bv-${i}"]`);
+    const avEl = document.querySelector(`[data-key="av-${i}"]`);
+
+    if (bpEl) {
+      const oldText = bpEl.textContent;
+      const newText = formatPrice(sym.bidPrices[i]);
+      if (oldText !== newText) {
+        bpEl.textContent = newText;
+        const oldVal = parseFloat(oldText.replace(',', '.'));
+        bpEl.classList.remove('flash-up', 'flash-down');
+        void bpEl.offsetWidth;
+        bpEl.classList.add(sym.bidPrices[i] > oldVal ? 'flash-up' : 'flash-down');
+      }
+    }
+    if (apEl) {
+      const oldText = apEl.textContent;
+      const newText = formatPrice(sym.askPrices[i]);
+      if (oldText !== newText) {
+        apEl.textContent = newText;
+        const oldVal = parseFloat(oldText.replace(',', '.'));
+        apEl.classList.remove('flash-up', 'flash-down');
+        void apEl.offsetWidth;
+        apEl.classList.add(sym.askPrices[i] > oldVal ? 'flash-up' : 'flash-down');
+      }
+    }
+
+    // Volume thay đổi nhẹ
+    if (Math.random() < 0.4) {
+      sym.bidVolumes[i] = Math.max(100, sym.bidVolumes[i] + Math.floor((Math.random() - 0.5) * 100000));
+      if (bvEl) bvEl.textContent = formatNumber(sym.bidVolumes[i]);
+    }
+    if (Math.random() < 0.4) {
+      sym.askVolumes[i] = Math.max(100, sym.askVolumes[i] + Math.floor((Math.random() - 0.5) * 100000));
+      if (avEl) avEl.textContent = formatNumber(sym.askVolumes[i]);
+    }
+  }
+
+  // Update current price (close to bid[0] or ask[0])
+  const newCurrent = +(Math.random() < 0.5 ? sym.bidPrices[0] : sym.askPrices[0]).toFixed(2);
+  if (newCurrent !== sym.currentPrice) {
+    sym.currentPrice = newCurrent;
+    sym.change = +(newCurrent - sym.refPrice).toFixed(2);
+    sym.changePct = +((sym.change / sym.refPrice) * 100).toFixed(2);
+    updateSymbolDisplay();
+  }
+
+  // Update ratio
+  const totalBid = sym.bidVolumes.reduce((a, b) => a + b, 0);
+  const totalAsk = sym.askVolumes.reduce((a, b) => a + b, 0);
+  const total = totalBid + totalAsk;
+  const buyPct = total > 0 ? (totalBid / total) * 100 : 50;
+  const sellPct = 100 - buyPct;
+  document.getElementById('ratioBuy').textContent = buyPct.toFixed(2).replace('.', ',') + '%';
+  document.getElementById('ratioSell').textContent = sellPct.toFixed(2).replace('.', ',') + '%';
+  document.getElementById('ratioBuyBar').style.width = buyPct + '%';
+  document.getElementById('ratioSellBar').style.width = sellPct + '%';
+
+  // Add a new match every few ticks
+  if (Math.random() < 0.7) {
+    addMatch();
+  }
+
+  updateMaxValues();
+  updateOrderValue();
+}
+
+// ===========================================================================
+// RECENT MATCHES
+// ===========================================================================
+let matchCounter = 0;
+function addMatch() {
+  const sym = symbols[currentSymbol];
+  const isBuy = Math.random() < 0.5;
+  const price = isBuy ? sym.bidPrices[0] : sym.askPrices[0];
+  const volumes = [100, 200, 500, 1000, 2000, 5000];
+  const vol = volumes[Math.floor(Math.random() * volumes.length)];
+
+  const now = new Date();
+  const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+
+  const list = document.getElementById('matchesList');
+  const row = document.createElement('div');
+  row.className = 'match-row new-match';
+  row.innerHTML = `
+    <div>${time}</div>
+    <div class="match-side-${isBuy ? 'buy' : 'sell'}">
+      <span class="pill">${isBuy ? 'MUA' : 'BÁN'}</span>
+    </div>
+    <div>${formatNumber(vol)}</div>
+    <div class="${isBuy ? 'up' : 'down'}" style="font-weight: 600;">${formatPrice(price)}</div>
+  `;
+  list.insertBefore(row, list.firstChild);
+
+  // Keep only 20 matches
+  while (list.children.length > 20) {
+    list.removeChild(list.lastChild);
+  }
+}
+
+// Pre-populate matches
+function initMatches() {
+  for (let i = 0; i < 8; i++) addMatch();
+}
+
+// ===========================================================================
+// SYMBOL SEARCH
+// ===========================================================================
+const symbolSearch = document.getElementById('symbolSearch');
+const searchDropdown = document.getElementById('searchDropdown');
+const searchResults = document.getElementById('searchResults');
+
+function showSearchResults(query) {
+  const q = query.trim().toUpperCase();
+  const matches = Object.values(symbols).filter(s =>
+    s.code.includes(q) || s.name.toUpperCase().includes(q)
+  );
+
+  if (matches.length === 0) {
+    searchDropdown.classList.remove('open');
+    return;
+  }
+
+  searchResults.innerHTML = matches.map(s => `
+    <div class="search-result" data-code="${s.code}">
+      <div class="result-symbol">${s.code} <span style="font-weight: 400; color: var(--text-muted); font-size: 11px;">· ${s.exchange}</span></div>
+      <div class="result-name">${s.name}</div>
+    </div>
+  `).join('');
+
+  searchResults.querySelectorAll('.search-result').forEach(el => {
+    el.addEventListener('click', () => {
+      selectSymbol(el.dataset.code);
+      searchDropdown.classList.remove('open');
+      symbolSearch.value = '';
+    });
+  });
+
+  searchDropdown.classList.add('open');
+}
+
+symbolSearch.addEventListener('focus', () => showSearchResults(''));
+symbolSearch.addEventListener('input', e => showSearchResults(e.target.value));
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.symbol-search-wrap')) {
+    searchDropdown.classList.remove('open');
+  }
+});
+
+// ===========================================================================
+// SELECT SYMBOL - all info updates
+// ===========================================================================
+function selectSymbol(code) {
+  if (!symbols[code]) return;
+  currentSymbol = code;
+  updateSymbolDisplay();
+  renderOrderbook();
+  renderChart();
+  // Clear matches and re-init
+  document.getElementById('matchesList').innerHTML = '';
+  initMatches();
+  // Update chart symbol
+  document.getElementById('chartSymbol').textContent = code;
+  document.getElementById('chartName').textContent = `${symbols[code].name} · 1D · ${symbols[code].exchange}`;
+  // Sync mã trong form đặt lệnh
+  const formSym = document.getElementById('formSymbolInput');
+  if (formSym) formSym.value = code;
+}
+
+function updateSymbolDisplay() {
+  const sym = symbols[currentSymbol];
+  document.getElementById('bigPrice').textContent = formatPrice(sym.currentPrice);
+  document.getElementById('bigName').textContent = `${sym.code} · ${sym.name}`;
+
+  const changeEl = document.getElementById('bigChange');
+  const isUp = sym.change >= 0;
+  changeEl.className = 'change ' + (isUp ? 'up' : 'down');
+  changeEl.textContent = `${isUp ? '▲' : '▼'} ${Math.abs(sym.change).toFixed(2).replace('.',',')} ${isUp ? '+' : '-'}${Math.abs(sym.changePct).toFixed(2).replace('.',',')}%`;
+
+  const bigPriceEl = document.getElementById('bigPrice');
+  bigPriceEl.style.color = isUp ? 'var(--color-buy)' : 'var(--color-sell)';
+
+  document.getElementById('metaCeiling').textContent = formatPrice(sym.ceilingPrice);
+  document.getElementById('metaFloor').textContent = formatPrice(sym.floorPrice);
+  document.getElementById('metaRef').textContent = formatPrice(sym.refPrice);
+  document.getElementById('metaVolume').textContent = sym.volume;
+}
+
+// ===========================================================================
+// ORDER TYPE - Dropdown + Chip sync
+// ===========================================================================
+const orderTypeSelect = document.getElementById('orderTypeSelect');
+
+orderTypeSelect.addEventListener('change', () => {
+  currentOrderType = orderTypeSelect.value;
+  syncOrderTypeUI();
+});
+
+document.querySelectorAll('#orderTypeChips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    currentOrderType = chip.dataset.type;
+    orderTypeSelect.value = currentOrderType;
+    syncOrderTypeUI();
+  });
+});
+
+function syncOrderTypeUI() {
+  // Update chip active state
+  document.querySelectorAll('#orderTypeChips .chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.type === currentOrderType);
+  });
+
+  // Disable price input for non-LO types
+  const priceInput = document.getElementById('priceInput');
+  if (currentOrderType === 'LO') {
+    priceInput.disabled = false;
+    priceInput.placeholder = 'Giá đặt';
+  } else {
+    priceInput.disabled = true;
+    priceInput.value = '';
+    priceInput.placeholder = currentOrderType;
+  }
+  updateOrderValue();
+}
+
+// ===========================================================================
+// FORM HELPERS
+// ===========================================================================
+function fillPrice(price) {
+  if (currentOrderType === 'LO') {
+    document.getElementById('priceInput').value = price.toFixed(2);
+    updateOrderValue();
+    updateMaxValues();
+  }
+}
+
+function adjustQty(delta) {
+  const input = document.getElementById('qtyInput');
+  const cur = parseInt(input.value) || 0;
+  input.value = Math.max(0, cur + delta);
+  updateOrderValue();
+}
+
+function adjustPrice(delta) {
+  if (currentOrderType !== 'LO') return;
+  const input = document.getElementById('priceInput');
+  const cur = parseFloat(input.value) || symbols[currentSymbol].refPrice;
+  input.value = Math.max(0, +(cur + delta).toFixed(2));
+  updateOrderValue();
+  updateMaxValues();
+}
+
+function updateOrderValue() {
+  const qty = parseInt(document.getElementById('qtyInput').value) || 0;
+  const price = parseFloat(document.getElementById('priceInput').value) || 0;
+  const value = qty * price * 1000; // assume price in thousands
+  document.getElementById('orderValue').textContent = value > 0 ? formatVND(value) : '— VND';
+}
+
+function updateMaxValues() {
+  const sym = symbols[currentSymbol];
+  const price = parseFloat(document.getElementById('priceInput').value) || sym.currentPrice;
+  // Mock buying power = 1 billion
+  const buyingPower = 1000000000;
+  const maxBuy = price > 0 ? Math.floor(buyingPower / (price * 1000) / 100) * 100 : 0;
+  document.getElementById('maxBuy').textContent = maxBuy > 0 ? formatNumber(maxBuy) + ' CP' : '— CP';
+  // Mock holding (only SHS has holding)
+  const mockHolding = currentSymbol === 'SHS' ? 800 : 0;
+  document.getElementById('maxSell').textContent = mockHolding > 0 ? formatNumber(mockHolding) + ' CP' : '0 CP';
+}
+
+document.getElementById('qtyInput').addEventListener('input', () => { updateOrderValue(); updateMaxValues(); });
+document.getElementById('priceInput').addEventListener('input', () => { updateOrderValue(); updateMaxValues(); });
+
+// ===========================================================================
+// CONFIRM MODAL
+// ===========================================================================
+let pendingOrder = null;
+
+function openConfirmModal(side) {
+  const qty = parseInt(document.getElementById('qtyInput').value) || 0;
+  const price = parseFloat(document.getElementById('priceInput').value) || 0;
+
+  if (qty <= 0) {
+    showToast('error', 'Lỗi nhập liệu', 'Vui lòng nhập khối lượng hợp lệ');
+    return;
+  }
+  if (currentOrderType === 'LO' && price <= 0) {
+    showToast('error', 'Lỗi nhập liệu', 'Vui lòng nhập giá đặt');
+    return;
+  }
+
+  pendingOrder = {
+    side,
+    symbol: currentSymbol,
+    qty,
+    price: currentOrderType === 'LO' ? price : symbols[currentSymbol].currentPrice,
+    type: currentOrderType,
+    time: new Date()
+  };
+
+  const modal = document.getElementById('confirmModal');
+  const header = document.getElementById('modalHeader');
+  const titleEl = document.getElementById('modalTitle');
+  const sideEl = document.getElementById('confirmSide');
+  const confirmBtn = document.getElementById('confirmBtn');
+
+  header.classList.remove('buy', 'sell');
+  confirmBtn.classList.remove('buy', 'sell');
+
+  if (side === 'BUY') {
+    header.classList.add('buy');
+    confirmBtn.classList.add('buy');
+    titleEl.textContent = 'Xác nhận lệnh MUA';
+    sideEl.textContent = 'MUA';
+    sideEl.className = 'detail-value buy';
+  } else {
+    header.classList.add('sell');
+    confirmBtn.classList.add('sell');
+    titleEl.textContent = 'Xác nhận lệnh BÁN';
+    sideEl.textContent = 'BÁN';
+    sideEl.className = 'detail-value sell';
+  }
+
+  document.getElementById('confirmSymbol').textContent = pendingOrder.symbol;
+  document.getElementById('confirmQty').textContent = formatNumber(pendingOrder.qty);
+  document.getElementById('confirmPrice').textContent = currentOrderType === 'LO' ? formatPrice(pendingOrder.price) : currentOrderType;
+  document.getElementById('confirmType').textContent = currentOrderType === 'LO' ? 'Lệnh giới hạn (LO)' : currentOrderType;
+  document.getElementById('confirmTotal').textContent = formatVND(pendingOrder.qty * pendingOrder.price * 1000);
+
+  modal.classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('confirmModal').classList.remove('open');
+  pendingOrder = null;
+}
+
+function confirmOrder() {
+  if (!pendingOrder) return;
+
+  // Add to orders table
+  addOrderToTable(pendingOrder);
+
+  // Show success toast
+  showToast(
+    'success',
+    'Đặt lệnh thành công',
+    `Lệnh ${pendingOrder.side === 'BUY' ? 'MUA' : 'BÁN'} ${formatNumber(pendingOrder.qty)} ${pendingOrder.symbol} @ ${pendingOrder.type === 'LO' ? formatPrice(pendingOrder.price) : pendingOrder.type}`
+  );
+
+  closeModal();
+
+  // Reset form
+  document.getElementById('qtyInput').value = '';
+  if (currentOrderType === 'LO') document.getElementById('priceInput').value = '';
+  updateOrderValue();
+  updateMaxValues();
+}
+
+// Click outside modal to close
+document.getElementById('confirmModal').addEventListener('click', e => {
+  if (e.target.id === 'confirmModal') closeModal();
+});
+
+// ===========================================================================
+// ORDERS TABLE
+// ===========================================================================
+function addOrderToTable(order) {
+  const tbody = document.getElementById('ordersBody');
+  const row = document.createElement('tr');
+  const time = order.time.toTimeString().substring(0, 8);
+  const date = order.time.toLocaleDateString('vi-VN');
+  const isBuy = order.side === 'BUY';
+
+  row.innerHTML = `
+    <td><input type="checkbox"></td>
+    <td><span class="${isBuy ? 'up' : 'down'}" style="font-weight: 700;">${isBuy ? 'MUA' : 'BÁN'}</span></td>
+    <td><strong>${order.symbol}</strong></td>
+    <td>${formatNumber(order.qty)}</td>
+    <td>${order.type === 'LO' ? formatPrice(order.price) : order.type}</td>
+    <td>0</td>
+    <td>—</td>
+    <td>${formatNumber(order.qty)}</td>
+    <td>0</td>
+    <td><span class="status-pill status-waiting">CHỜ KHỚP</span></td>
+    <td>${time} | ${date}</td>
+    <td>
+      <div class="action-btns">
+        <button title="Sửa">✏️</button>
+        <button class="delete" title="Hủy">✕</button>
+      </div>
+    </td>
+  `;
+
+  // Insert after total row
+  const totalRow = tbody.querySelector('.total-row');
+  totalRow.insertAdjacentElement('afterend', row);
+}
+
+// Initialize sample orders
+function initOrders() {
+  const samples = [
+    { side: 'SELL', symbol: 'SHS', qty: 1000000, priceAt: 10.000, klKhop: 300000, gtKhop: 3000000000, status: 'partial', time: '10:00:00 | 24/02/2025' },
+    { side: 'BUY', symbol: 'SHS', qty: 1000000, priceAt: 10.000, klKhop: 300000, gtKhop: 3000000000, status: 'waiting', time: '10:00:00 | 24/02/2025' },
+    { side: 'SELL', symbol: 'SHS', qty: 1000000, priceAt: 10.000, klKhop: 300000, gtKhop: 3000000000, status: 'filled', time: '10:00:00 | 24/02/2025' },
+  ];
+
+  const tbody = document.getElementById('ordersBody');
+  const totalRow = tbody.querySelector('.total-row');
+  samples.forEach(o => {
+    const row = document.createElement('tr');
+    const isBuy = o.side === 'BUY';
+    const statusMap = {
+      waiting: ['CHỜ KHỚP', 'status-waiting'],
+      partial: ['KHỚP MỘT PHẦN', 'status-partial'],
+      filled: ['KHỚP HẾT', 'status-filled'],
+      cancelled: ['ĐÃ HỦY', 'status-cancelled']
+    };
+    const [statusText, statusClass] = statusMap[o.status];
+    row.innerHTML = `
+      <td><input type="checkbox"></td>
+      <td><span class="${isBuy ? 'up' : 'down'}" style="font-weight: 700;">${isBuy ? 'MUA' : 'BÁN'}</span></td>
+      <td><strong>${o.symbol}</strong></td>
+      <td>${formatNumber(o.qty)}</td>
+      <td>${o.priceAt.toFixed(3).replace('.',',')}</td>
+      <td>${formatNumber(o.klKhop)}</td>
+      <td>${o.priceAt.toFixed(3).replace('.',',')}</td>
+      <td>${formatNumber(o.qty - o.klKhop)}</td>
+      <td>${formatNumber(o.gtKhop)}</td>
+      <td><span class="status-pill ${statusClass}">${statusText}</span></td>
+      <td>${o.time}</td>
+      <td>
+        <div class="action-btns">
+          <button title="Sửa">✏️</button>
+          <button class="delete" title="Hủy">✕</button>
+        </div>
+      </td>
+    `;
+    totalRow.insertAdjacentElement('afterend', row);
+  });
+}
+
+// ===========================================================================
+// TOAST
+// ===========================================================================
+function showToast(type, title, message) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + (type === 'error' ? 'error' : '');
+  toast.innerHTML = `
+    <div class="toast-icon">${type === 'error' ? '⚠️' : '✓'}</div>
+    <div class="toast-content">
+      <strong>${title}</strong>
+      <span>${message}</span>
+    </div>
+  `;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = 'toastOut 0.3s ease forwards';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+// ===========================================================================
+// INIT
+// ===========================================================================
+window.addEventListener('DOMContentLoaded', () => {
+  updateSymbolDisplay();
+  renderOrderbook();
+  renderChart();
+  initMatches();
+  initOrders();
+  updateMaxValues();
+  updateOrderValue();
+
+  // Start ticker
+  setInterval(tickPrices, 1500);
+
+  // Re-render chart on window resize
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderChart, 200);
+  });
+});
+</script>
+
+</body>
+</html>
