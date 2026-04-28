@@ -52,21 +52,21 @@
 [data-theme="dark"] {
   --bg-page: #0a0e1a;
   --bg-panel: #161b2c;
-  --bg-panel-alt: #1f2538;
+  --bg-panel-alt: #232a40;
   --bg-input: #0f1320;
-  --bg-hover: #2a3148;
+  --bg-hover: #303a55;
   --bg-header: #0a0e1a;
   --bg-decision: #4a3a0c;
   --bg-decision-border: #fbbf24;
 
   --text-primary: #ffffff;
-  --text-secondary: #e2e8f0;
-  --text-muted: #94a3b8;
+  --text-secondary: #f1f5f9;
+  --text-muted: #b8c2d1;
   --text-inverse: #0a0e1a;
 
-  --border: #2a3148;
-  --border-strong: #475569;
-  --border-input: #475569;
+  --border: #3a4259;
+  --border-strong: #5b6680;
+  --border-input: #5b6680;
 
   --color-buy: #00e676;
   --color-buy-bg: #003d20;
@@ -576,6 +576,61 @@ body {
 
 .action-btns button:hover { background: var(--bg-hover); }
 .action-btns .delete:hover { background: var(--color-sell-bg-light); color: var(--color-sell); border-color: var(--color-sell); }
+
+/* Holdings table */
+.holdings-table th, .holdings-table td {
+  white-space: nowrap;
+}
+
+.holdings-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.pl-positive { color: var(--color-buy); font-weight: 700; }
+.pl-negative { color: var(--color-sell); font-weight: 700; }
+.pl-neutral { color: var(--color-ref); font-weight: 700; }
+
+.holdings-action-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.btn-mini-action {
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.btn-mini-action.btn-oco {
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+}
+.btn-mini-action.btn-oco:hover {
+  background: #3b82f6;
+  color: white;
+}
+[data-theme="dark"] .btn-mini-action.btn-oco {
+  border-color: #60a5fa;
+  color: #60a5fa;
+}
+
+.btn-mini-action.btn-sell-cp {
+  border: 1px solid var(--color-sell);
+  color: var(--color-sell);
+}
+.btn-mini-action.btn-sell-cp:hover {
+  background: var(--color-sell);
+  color: white;
+}
 
 /* ============================================
    MID COLUMN - ORDERBOOK & MATCHES
@@ -1587,59 +1642,90 @@ body {
     <!-- Orders panel -->
     <div class="panel orders-panel">
       <div class="orders-tabs">
-        <button class="active">Lệnh chờ khớp</button>
-        <button>Lệnh đã thực hiện</button>
-        <button>Lệnh đặt trước</button>
-        <button>Lệnh điều kiện</button>
-        <button>Danh mục nắm giữ</button>
+        <button class="active" data-tab="pending">Lệnh chờ khớp</button>
+        <button data-tab="executed">Lệnh đã thực hiện</button>
+        <button data-tab="advance">Lệnh đặt trước</button>
+        <button data-tab="condition">Lệnh điều kiện</button>
+        <button data-tab="holdings">Danh mục nắm giữ</button>
       </div>
-      <div class="orders-filter">
-        <input type="text" placeholder="Tìm kiếm mã...">
-        <select>
-          <option>Tất cả loại lệnh</option>
-          <option>Mua</option>
-          <option>Bán</option>
-        </select>
-        <select>
-          <option>Tất cả trạng thái</option>
-          <option>Chờ khớp</option>
-          <option>Khớp một phần</option>
-          <option>Đã hủy</option>
-        </select>
-        <button class="btn-cancel-all">Hủy tất cả</button>
+
+      <!-- Default view: Orders -->
+      <div class="orders-view" data-view="default">
+        <div class="orders-filter">
+          <input type="text" placeholder="Tìm kiếm mã...">
+          <select>
+            <option>Tất cả loại lệnh</option>
+            <option>Mua</option>
+            <option>Bán</option>
+          </select>
+          <select>
+            <option>Tất cả trạng thái</option>
+            <option>Chờ khớp</option>
+            <option>Khớp một phần</option>
+            <option>Đã hủy</option>
+          </select>
+          <button class="btn-cancel-all">Hủy tất cả</button>
+        </div>
+        <div class="orders-table-wrap">
+          <table class="orders-table" id="ordersTable">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>Lệnh</th>
+                <th>Mã CK</th>
+                <th>KL đặt</th>
+                <th>Giá đặt</th>
+                <th>KL khớp</th>
+                <th>Giá khớp</th>
+                <th>KL chờ khớp</th>
+                <th>GT đã khớp</th>
+                <th>Trạng thái</th>
+                <th>Thời gian</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody">
+              <tr class="total-row">
+                <td colspan="3"><strong>Tổng cộng</strong></td>
+                <td id="totalKlDat">1.000.000</td>
+                <td>—</td>
+                <td id="totalKlKhop">300.000</td>
+                <td>—</td>
+                <td id="totalKlCho">700.000</td>
+                <td id="totalGtKhop">3.000.000.000</td>
+                <td colspan="3"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="orders-table-wrap">
-        <table class="orders-table" id="ordersTable">
-          <thead>
-            <tr>
-              <th><input type="checkbox"></th>
-              <th>Lệnh</th>
-              <th>Mã CK</th>
-              <th>KL đặt</th>
-              <th>Giá đặt</th>
-              <th>KL khớp</th>
-              <th>Giá khớp</th>
-              <th>KL chờ khớp</th>
-              <th>GT đã khớp</th>
-              <th>Trạng thái</th>
-              <th>Thời gian</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody id="ordersBody">
-            <tr class="total-row">
-              <td colspan="3"><strong>Tổng cộng</strong></td>
-              <td id="totalKlDat">1.000.000</td>
-              <td>—</td>
-              <td id="totalKlKhop">300.000</td>
-              <td>—</td>
-              <td id="totalKlCho">700.000</td>
-              <td id="totalGtKhop">3.000.000.000</td>
-              <td colspan="3"></td>
-            </tr>
-            <!-- Sample orders will be added by JS -->
-          </tbody>
-        </table>
+
+      <!-- Holdings view -->
+      <div class="orders-view hidden" data-view="holdings">
+        <div class="orders-filter">
+          <input type="text" placeholder="Tìm kiếm mã" id="holdingsSearch">
+          <button class="btn-cancel-all" style="margin-left: auto;">Bán tất cả</button>
+        </div>
+        <div class="orders-table-wrap">
+          <table class="orders-table holdings-table" id="holdingsTable">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>Mã CK ▼</th>
+                <th>Tổng KL</th>
+                <th>KL được GD</th>
+                <th>Mua T0</th>
+                <th>Mua T1</th>
+                <th>Mua T2</th>
+                <th>Giá vốn</th>
+                <th>Giá hiện tại</th>
+                <th>Lãi/lỗ dự kiến</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="holdingsBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -2651,6 +2737,77 @@ function initOrders() {
 }
 
 // ===========================================================================
+// HOLDINGS (Danh mục nắm giữ)
+// ===========================================================================
+const holdings = [
+  { code: 'SHS', totalQty: 5000,  tradableQty: 5000,  t0: 0,    t1: 0,    t2: 0,   avgPrice: 17500, currentPrice: 18400 },
+  { code: 'HPG', totalQty: 10000, tradableQty: 7000,  t0: 1000, t1: 2000, t2: 0,   avgPrice: 22000, currentPrice: 26500 },
+  { code: 'MWG', totalQty: 3000,  tradableQty: 3000,  t0: 0,    t1: 0,    t2: 0,   avgPrice: 65000, currentPrice: 56000 },
+  { code: 'VNM', totalQty: 8000,  tradableQty: 8000,  t0: 0,    t1: 0,    t2: 0,   avgPrice: 75000, currentPrice: 75000 },
+  { code: 'FPT', totalQty: 2500,  tradableQty: 2000,  t0: 0,    t1: 500,  t2: 0,   avgPrice: 120000, currentPrice: 132500 },
+];
+
+function renderHoldings(filter = '') {
+  const tbody = document.getElementById('holdingsBody');
+  const q = filter.trim().toUpperCase();
+  const rows = q ? holdings.filter(h => h.code === q) : holdings;
+
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="11" class="holdings-empty">Không có mã nào trong danh mục</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(h => {
+    const plValue = (h.currentPrice - h.avgPrice) * h.totalQty;
+    const plPct = h.avgPrice > 0 ? ((h.currentPrice / h.avgPrice - 1) * 100) : 0;
+    const plClass = plValue > 0 ? 'pl-positive' : plValue < 0 ? 'pl-negative' : 'pl-neutral';
+    const plSign = plValue > 0 ? '+ ' : plValue < 0 ? '- ' : '';
+    const pctSign = plPct > 0 ? '+ ' : plPct < 0 ? '- ' : '+ ';
+    return `
+      <tr>
+        <td><input type="checkbox"></td>
+        <td><strong>${h.code}</strong></td>
+        <td>${formatNumber(h.totalQty)}</td>
+        <td><strong>${formatNumber(h.tradableQty)}</strong></td>
+        <td>${formatNumber(h.t0)}</td>
+        <td>${formatNumber(h.t1)}</td>
+        <td>${formatNumber(h.t2)}</td>
+        <td>${formatNumber(h.avgPrice)}</td>
+        <td>${formatNumber(h.currentPrice)}</td>
+        <td class="${plClass}">${plSign}${formatNumber(Math.abs(plValue))} ( ${pctSign}${Math.abs(plPct).toFixed(2).replace('.', ',')}%)</td>
+        <td>
+          <div class="holdings-action-row">
+            <button class="btn-mini-action btn-oco">Đặt lệnh OCO</button>
+            <button class="btn-mini-action btn-sell-cp">Bán CP</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Tab switching
+document.querySelectorAll('.orders-tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.orders-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const tab = btn.dataset.tab;
+    const targetView = tab === 'holdings' ? 'holdings' : 'default';
+    document.querySelectorAll('.orders-view').forEach(v => {
+      v.classList.toggle('hidden', v.dataset.view !== targetView);
+    });
+
+    if (tab === 'holdings') renderHoldings(document.getElementById('holdingsSearch').value);
+  });
+});
+
+// Holdings search
+document.getElementById('holdingsSearch').addEventListener('input', e => {
+  renderHoldings(e.target.value);
+});
+
+// ===========================================================================
 // TOAST
 // ===========================================================================
 function showToast(type, title, message) {
@@ -2681,6 +2838,7 @@ window.addEventListener('DOMContentLoaded', () => {
   renderChart();
   initMatches();
   initOrders();
+  renderHoldings();
   updateMaxValues();
   updateOrderValue();
 
