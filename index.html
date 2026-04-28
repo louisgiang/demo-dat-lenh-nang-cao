@@ -1023,6 +1023,125 @@ body {
   font-size: 12px;
 }
 
+/* Mode toggle KH/MG */
+.mode-toggle {
+  display: flex;
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.mode-toggle button {
+  padding: 5px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+}
+
+.mode-toggle button.active {
+  background: var(--color-accent);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.mode-toggle button:not(.active):hover {
+  background: var(--bg-hover);
+}
+
+/* Customer select (broker mode dropdown) */
+.customer-select-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.customer-select-btn {
+  width: 100%;
+  padding: 8px 28px 8px 10px;
+  border: 1px solid var(--border-input);
+  border-radius: 6px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: inherit;
+}
+
+.customer-select-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.customer-select-btn:not(:disabled):hover {
+  border-color: var(--color-accent);
+}
+
+.customer-select-btn .dropdown-arrow {
+  color: var(--text-muted);
+  font-size: 10px;
+  margin-left: 8px;
+}
+
+.customer-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  max-height: 320px;
+  overflow-y: auto;
+  min-width: 280px;
+}
+
+.customer-dropdown.open { display: block; }
+
+.customer-list-label {
+  padding: 10px 12px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.customer-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-top: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.customer-item:hover { background: var(--bg-hover); }
+
+.customer-item .cust-code {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+.customer-item .cust-name {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: 2px;
+}
+
 /* ============================================
    ORDER FORM
    ============================================ */
@@ -1112,7 +1231,7 @@ body {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  justify-content: center;
+  padding-left: 102px; /* align với input column (90px label + 12px gap) */
 }
 
 .chip {
@@ -1600,6 +1719,10 @@ body {
     <div class="header-search">
       <input type="text" placeholder="Tìm kiếm...">
     </div>
+    <div class="mode-toggle" id="modeToggle" title="Chuyển chế độ Khách hàng / Môi giới">
+      <button class="active" data-mode="KH">KH</button>
+      <button data-mode="MG">MG</button>
+    </div>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
     <button class="icon-btn" title="Thông báo">🔔</button>
     <button class="icon-btn" title="Cài đặt">⚙️</button>
@@ -1804,9 +1927,21 @@ body {
     <div class="panel">
       <div class="account-info-panel">
         <div class="account-select">
-          <select>
-            <option>000000 - Nguyễn Văn A</option>
-          </select>
+          <div class="customer-select-wrap">
+            <button type="button" class="customer-select-btn" id="customerSelectBtn" disabled>
+              <span id="customerSelectLabel">000000 - Nguyễn Văn A</span>
+              <span class="dropdown-arrow">▾</span>
+            </button>
+            <div class="customer-dropdown" id="customerDropdown">
+              <div class="search-recent">
+                <div class="search-recent-label">Gần đây</div>
+                <div class="search-chips-row" id="customerRecentChips"></div>
+              </div>
+              <div class="search-divider"></div>
+              <div class="customer-list-label">KH quản lý</div>
+              <div id="customerList"></div>
+            </div>
+          </div>
           <select>
             <option>Tiểu khoản 01</option>
           </select>
@@ -2737,6 +2872,103 @@ function initOrders() {
 }
 
 // ===========================================================================
+// MODE TOGGLE (KH/MG) + CUSTOMER DROPDOWN (broker mode)
+// ===========================================================================
+let currentMode = 'KH';
+
+const customers = [
+  { code: '000000', name: 'Nguyễn Văn A' },
+  { code: '000142', name: 'Trần Thị Bích' },
+  { code: '000287', name: 'Lê Văn Cường' },
+  { code: '000345', name: 'Phạm Thị Dung' },
+  { code: '000412', name: 'Hoàng Minh Đức' },
+  { code: '000578', name: 'Vũ Thị Hằng' },
+  { code: '000691', name: 'Đỗ Quốc Khánh' },
+  { code: '000724', name: 'Bùi Thanh Loan' },
+];
+const recentCustomers = ['000142', '000287'];
+let selectedCustomer = '000000';
+
+function pushRecentCustomer(code) {
+  if (code === '000000') return;
+  const idx = recentCustomers.indexOf(code);
+  if (idx >= 0) recentCustomers.splice(idx, 1);
+  recentCustomers.unshift(code);
+  if (recentCustomers.length > 5) recentCustomers.length = 5;
+}
+
+function getCustomerByCode(code) {
+  return customers.find(c => c.code === code);
+}
+
+function renderCustomerDropdown() {
+  // Recent chips
+  const chipsWrap = document.getElementById('customerRecentChips');
+  const validRecents = recentCustomers.filter(c => getCustomerByCode(c));
+  chipsWrap.innerHTML = validRecents.length
+    ? validRecents.map(code => `<div class="search-chip" data-code="${code}">${code}</div>`).join('')
+    : `<div style="font-size: 11px; color: var(--text-muted); padding: 2px;">Chưa có</div>`;
+
+  // List of managed customers
+  const listEl = document.getElementById('customerList');
+  listEl.innerHTML = customers.map(c => `
+    <div class="customer-item" data-code="${c.code}">
+      <div class="cust-code">${c.code}</div>
+      <div class="cust-name">${c.name}</div>
+    </div>
+  `).join('');
+
+  // Bind clicks
+  document.querySelectorAll('#customerRecentChips .search-chip, #customerList .customer-item').forEach(el => {
+    el.addEventListener('click', () => selectCustomer(el.dataset.code));
+  });
+}
+
+function selectCustomer(code) {
+  const c = getCustomerByCode(code);
+  if (!c) return;
+  selectedCustomer = code;
+  pushRecentCustomer(code);
+  document.getElementById('customerSelectLabel').textContent = `${c.code} - ${c.name}`;
+  document.getElementById('customerDropdown').classList.remove('open');
+  renderCustomerDropdown();
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('#modeToggle button').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  const btn = document.getElementById('customerSelectBtn');
+  const arrow = btn.querySelector('.dropdown-arrow');
+  if (mode === 'MG') {
+    btn.disabled = false;
+    arrow.style.opacity = '1';
+  } else {
+    btn.disabled = true;
+    arrow.style.opacity = '0.3';
+    document.getElementById('customerDropdown').classList.remove('open');
+    // Reset to current user
+    selectCustomer('000000');
+  }
+}
+
+document.querySelectorAll('#modeToggle button').forEach(btn => {
+  btn.addEventListener('click', () => setMode(btn.dataset.mode));
+});
+
+document.getElementById('customerSelectBtn').addEventListener('click', e => {
+  if (e.currentTarget.disabled) return;
+  document.getElementById('customerDropdown').classList.toggle('open');
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.customer-select-wrap')) {
+    document.getElementById('customerDropdown').classList.remove('open');
+  }
+});
+
+// ===========================================================================
 // HOLDINGS (Danh mục nắm giữ)
 // ===========================================================================
 const holdings = [
@@ -2839,6 +3071,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initMatches();
   initOrders();
   renderHoldings();
+  renderCustomerDropdown();
   updateMaxValues();
   updateOrderValue();
 
