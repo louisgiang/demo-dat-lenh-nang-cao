@@ -316,7 +316,7 @@ body {
   grid-area: right;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
   min-height: 0;
   overflow-y: auto;
@@ -738,12 +738,12 @@ body {
    RIGHT COLUMN - SYMBOL INFO + ORDER FORM
    ============================================ */
 .symbol-info-panel {
-  padding: 14px;
+  padding: 10px 12px;
 }
 
 .symbol-search-wrap {
   position: relative;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .symbol-search {
@@ -819,54 +819,113 @@ body {
   margin-top: 2px;
 }
 
-.symbol-price {
+/* Combined price + meta row (single line) */
+.symbol-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
-  margin: 8px 0;
+  margin-top: 6px;
 }
 
-.symbol-price .big-price {
-  font-size: 24px;
+.price-block .big-price {
+  display: block;
+  font-size: 22px;
   font-weight: 800;
+  line-height: 1.1;
 }
 
-.symbol-price .change {
-  font-size: 13px;
+.price-block .change {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+.meta-inline {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  justify-content: center;
+}
+
+.meta-inline > div {
+  text-align: center;
+  min-width: 38px;
+}
+
+.meta-inline .meta-label,
+.symbol-volume .meta-label {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
   font-weight: 600;
 }
 
-.symbol-meta {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-}
-
-.meta-item {
-  text-align: center;
-}
-
-.meta-item .meta-label {
-  font-size: 10px;
-  color: var(--text-muted);
-  margin-bottom: 2px;
-}
-
-.meta-item .meta-value {
+.meta-inline .meta-value,
+.symbol-volume .meta-value {
+  display: block;
   font-weight: 700;
   font-size: 12px;
+  margin-top: 1px;
+  white-space: nowrap;
 }
 
-.meta-item.ceiling .meta-value { color: var(--color-ceiling); }
-.meta-item.floor .meta-value { color: var(--color-floor); }
-.meta-item.ref .meta-value { color: var(--color-ref); }
+.meta-inline .ceiling .meta-value { color: var(--color-ceiling); }
+.meta-inline .floor .meta-value { color: var(--color-floor); }
+.meta-inline .ref .meta-value { color: var(--color-ref); }
+
+.symbol-volume {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Search recent chips */
+.search-recent {
+  padding: 10px 12px;
+}
+
+.search-recent-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 8px;
+}
+
+.search-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.search-chip {
+  padding: 5px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.search-chip:hover {
+  background: var(--bg-hover);
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+.search-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
 
 /* Account info */
 .account-info-panel {
-  padding: 14px;
+  padding: 10px 12px;
   background: var(--bg-panel);
 }
 
@@ -874,7 +933,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: 5px 0;
   font-size: 12px;
 }
 
@@ -913,10 +972,10 @@ body {
    ORDER FORM
    ============================================ */
 .order-form-panel {
-  padding: 14px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .form-row-2col {
@@ -977,7 +1036,7 @@ body {
   flex: 1;
   border: none;
   background: transparent;
-  padding: 10px 8px 10px 0;
+  padding: 8px 8px 8px 10px;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
@@ -1032,8 +1091,8 @@ body {
 }
 
 .input-with-controls button {
-  width: 36px;
-  height: 40px;
+  width: 32px;
+  height: 34px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -1092,10 +1151,10 @@ body {
 }
 
 .btn-buy, .btn-sell {
-  padding: 14px;
+  padding: 11px;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   cursor: pointer;
   color: white;
@@ -1148,15 +1207,15 @@ body {
 }
 
 .quick-info-panel {
-  padding: 14px;
+  padding: 10px 12px;
 }
 
 .quick-actions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 6px;
-  padding-top: 12px;
-  margin-top: 12px;
+  padding-top: 8px;
+  margin-top: 8px;
   border-top: 1px solid var(--border);
 }
 
@@ -1632,35 +1691,25 @@ body {
     <!-- Symbol search & info -->
     <div class="panel symbol-info-panel">
       <div class="symbol-search-wrap">
-        <input type="text" class="symbol-search" id="symbolSearch" placeholder="Tìm mã chứng khoán..." autocomplete="off">
+        <input type="text" class="symbol-search" id="symbolSearch" autocomplete="off">
         <div class="search-dropdown" id="searchDropdown">
-          <div class="search-dropdown-header">Gợi ý</div>
           <div id="searchResults"></div>
         </div>
       </div>
 
-      <div class="symbol-price">
-        <span class="big-price" id="bigPrice">18,40</span>
-        <span class="change down" id="bigChange">▼ 0,10 -0,54%</span>
-      </div>
-      <div style="font-size: 11px; color: var(--text-muted);" id="bigName">SHS · Cổ phiếu CTCP Chứng khoán Sài Gòn - Hà Nội</div>
-
-      <div class="symbol-meta">
-        <div class="meta-item ceiling">
-          <div class="meta-label">Trần</div>
-          <div class="meta-value" id="metaCeiling">20,30</div>
+      <div class="symbol-row">
+        <div class="price-block">
+          <span class="big-price" id="bigPrice">18,40</span>
+          <span class="change down" id="bigChange">▼ 0,10 -0,54%</span>
         </div>
-        <div class="meta-item floor">
-          <div class="meta-label">Sàn</div>
-          <div class="meta-value" id="metaFloor">16,30</div>
+        <div class="meta-inline">
+          <div class="ceiling"><span class="meta-label">Trần</span><span class="meta-value" id="metaCeiling">20,30</span></div>
+          <div class="floor"><span class="meta-label">Sàn</span><span class="meta-value" id="metaFloor">16,30</span></div>
+          <div class="ref"><span class="meta-label">TC</span><span class="meta-value" id="metaRef">18,50</span></div>
         </div>
-        <div class="meta-item ref">
-          <div class="meta-label">TC</div>
-          <div class="meta-value" id="metaRef">18,50</div>
-        </div>
-        <div class="meta-item">
-          <div class="meta-label">KLGD</div>
-          <div class="meta-value" id="metaVolume">2.5M</div>
+        <div class="symbol-volume">
+          <span class="meta-label">KLGD</span>
+          <span class="meta-value" id="metaVolume">2.500.000</span>
         </div>
       </div>
     </div>
@@ -2210,38 +2259,92 @@ function initMatches() {
 const symbolSearch = document.getElementById('symbolSearch');
 const searchDropdown = document.getElementById('searchDropdown');
 const searchResults = document.getElementById('searchResults');
+const recentSymbols = ['HPG', 'MWG', 'SHS', 'VNM', 'FPT'];
+
+function pushRecent(code) {
+  const idx = recentSymbols.indexOf(code);
+  if (idx >= 0) recentSymbols.splice(idx, 1);
+  recentSymbols.unshift(code);
+  if (recentSymbols.length > 5) recentSymbols.length = 5;
+}
+
+function renderRecentChips() {
+  const validRecents = recentSymbols.filter(c => symbols[c]);
+  const chipsHtml = validRecents.map(c =>
+    `<div class="search-chip" data-code="${c}">${c}</div>`
+  ).join('');
+  return `
+    <div class="search-recent">
+      <div class="search-recent-label">Gần đây</div>
+      <div class="search-chips-row">${chipsHtml}</div>
+    </div>
+    <div class="search-divider"></div>
+  `;
+}
 
 function showSearchResults(query) {
   const q = query.trim().toUpperCase();
+  const isEmpty = q === '' || q === getSymbolDisplayValue(currentSymbol).toUpperCase();
   const matches = Object.values(symbols).filter(s =>
     s.code.includes(q) || s.name.toUpperCase().includes(q)
   );
 
-  if (matches.length === 0) {
+  let html = '';
+  if (isEmpty) {
+    html += renderRecentChips();
+    html += matches.slice(0, 6).map(s => `
+      <div class="search-result" data-code="${s.code}">
+        <div class="result-symbol">${s.code} <span style="font-weight: 400; color: var(--text-muted); font-size: 11px;">· ${s.exchange}</span></div>
+        <div class="result-name">${s.name}</div>
+      </div>
+    `).join('');
+  } else if (matches.length > 0) {
+    html = matches.map(s => `
+      <div class="search-result" data-code="${s.code}">
+        <div class="result-symbol">${s.code} <span style="font-weight: 400; color: var(--text-muted); font-size: 11px;">· ${s.exchange}</span></div>
+        <div class="result-name">${s.name}</div>
+      </div>
+    `).join('');
+  } else {
     searchDropdown.classList.remove('open');
     return;
   }
 
-  searchResults.innerHTML = matches.map(s => `
-    <div class="search-result" data-code="${s.code}">
-      <div class="result-symbol">${s.code} <span style="font-weight: 400; color: var(--text-muted); font-size: 11px;">· ${s.exchange}</span></div>
-      <div class="result-name">${s.name}</div>
-    </div>
-  `).join('');
+  searchResults.innerHTML = html;
 
   searchResults.querySelectorAll('.search-result').forEach(el => {
     el.addEventListener('click', () => {
       selectSymbol(el.dataset.code);
       searchDropdown.classList.remove('open');
-      symbolSearch.value = '';
+      symbolSearch.blur();
+    });
+  });
+  searchResults.querySelectorAll('.search-chip').forEach(el => {
+    el.addEventListener('click', () => {
+      selectSymbol(el.dataset.code);
+      searchDropdown.classList.remove('open');
+      symbolSearch.blur();
     });
   });
 
   searchDropdown.classList.add('open');
 }
 
-symbolSearch.addEventListener('focus', () => showSearchResults(''));
+function getSymbolDisplayValue(code) {
+  const s = symbols[code];
+  return s ? `${s.code} - ${s.name}` : '';
+}
+
+symbolSearch.addEventListener('focus', () => {
+  symbolSearch.select();
+  showSearchResults('');
+});
 symbolSearch.addEventListener('input', e => showSearchResults(e.target.value));
+symbolSearch.addEventListener('blur', () => {
+  setTimeout(() => {
+    symbolSearch.value = getSymbolDisplayValue(currentSymbol);
+  }, 150);
+});
 
 document.addEventListener('click', e => {
   if (!e.target.closest('.symbol-search-wrap')) {
@@ -2255,6 +2358,7 @@ document.addEventListener('click', e => {
 function selectSymbol(code) {
   if (!symbols[code]) return;
   currentSymbol = code;
+  pushRecent(code);
   updateSymbolDisplay();
   renderOrderbook();
   renderChart();
@@ -2272,7 +2376,6 @@ function selectSymbol(code) {
 function updateSymbolDisplay() {
   const sym = symbols[currentSymbol];
   document.getElementById('bigPrice').textContent = formatPrice(sym.currentPrice);
-  document.getElementById('bigName').textContent = `${sym.code} · ${sym.name}`;
 
   const changeEl = document.getElementById('bigChange');
   const isUp = sym.change >= 0;
@@ -2286,6 +2389,10 @@ function updateSymbolDisplay() {
   document.getElementById('metaFloor').textContent = formatPrice(sym.floorPrice);
   document.getElementById('metaRef').textContent = formatPrice(sym.refPrice);
   document.getElementById('metaVolume').textContent = sym.volume;
+
+  if (document.activeElement !== symbolSearch) {
+    symbolSearch.value = getSymbolDisplayValue(currentSymbol);
+  }
 }
 
 // ===========================================================================
