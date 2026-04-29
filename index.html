@@ -1790,15 +1790,15 @@ body {
     <!-- Orders panel -->
     <div class="panel orders-panel">
       <div class="orders-tabs">
-        <button class="active" data-tab="pending">Lệnh chờ khớp</button>
+        <button class="active" data-tab="holdings">Danh mục nắm giữ</button>
+        <button data-tab="pending">Lệnh chờ khớp</button>
         <button data-tab="executed">Lệnh đã thực hiện</button>
         <button data-tab="advance">Lệnh đặt trước</button>
         <button data-tab="condition">Lệnh điều kiện</button>
-        <button data-tab="holdings">Danh mục nắm giữ</button>
       </div>
 
       <!-- Default view: Orders -->
-      <div class="orders-view" data-view="default">
+      <div class="orders-view hidden" data-view="default">
         <div class="orders-filter">
           <input type="text" placeholder="Tìm kiếm mã...">
           <select>
@@ -1849,7 +1849,7 @@ body {
       </div>
 
       <!-- Holdings view -->
-      <div class="orders-view hidden" data-view="holdings">
+      <div class="orders-view" data-view="holdings">
         <div class="orders-filter">
           <input type="text" placeholder="Tìm kiếm mã" id="holdingsSearch">
           <button class="btn-cancel-all" style="margin-left: auto;">Bán tất cả</button>
