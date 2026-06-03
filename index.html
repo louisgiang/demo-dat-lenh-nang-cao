@@ -1722,6 +1722,190 @@ body {
   .header { flex-wrap: wrap; }
   .nav { order: 3; flex-basis: 100%; overflow-x: auto; }
 }
+
+/* ============================================
+   VIEW SWITCH + CHẾ ĐỘ NHIỀU MÃ (multi-symbol)
+   ============================================ */
+.view.hidden { display: none !important; }
+.view-mode-toggle { margin-left: 4px; }
+
+#view-multi {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 16px;
+  height: calc(100vh - 65px);
+  overflow: hidden;
+}
+
+/* Khu trên: 4 cột + form phải */
+.ms-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* THÂN TRÁI: 4 cột cố định, co giãn đều theo bề rộng */
+.ms-columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.ms-column {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+
+/* TODO[highlight] — kiểu hiển thị cột ĐANG CHỌN CHƯA CHỐT thiết kế.
+   Đổi CSS trong block này (hoặc thêm biến highlightStyle ở JS) để thử nhanh kiểu khác:
+   vd chỉ đổi nền, hoặc thêm thanh màu trên đỉnh cột thay cho viền. */
+.ms-column--active {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+  background: var(--color-primary-light);
+}
+
+.ms-col-head {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ms-col-head .symbol-search-wrap::before { display: none; } /* cột không cần icon kính lúp */
+.ms-col-head .symbol-search { padding-left: 12px; }
+.ms-col-exchange {
+  font-size: 10px; font-weight: 700; color: var(--text-muted);
+  margin-top: 4px; text-transform: uppercase; letter-spacing: .4px; min-height: 12px;
+}
+
+.ms-col-data {
+  flex: 1; overflow-y: auto; padding: 8px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+
+/* EMPTY STATE: chỉ hiện ô tìm mã, vùng dữ liệu trống */
+.ms-col-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--text-muted); font-size: 12px; text-align: center;
+  padding: 24px 12px; gap: 8px;
+}
+.ms-col-empty .ms-empty-icon { font-size: 30px; opacity: .45; }
+
+/* Khối giá đầu cột */
+.ms-price-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.ms-price-top .ms-price { font-size: 20px; font-weight: 800; line-height: 1.1; }
+.ms-price-top .ms-change { font-size: 12px; font-weight: 700; }
+
+.ms-sub-line { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; gap: 6px; }
+.ms-acc-line { font-size: 11px; display: flex; justify-content: space-between; }
+.ms-acc-line .label { color: var(--text-muted); }
+
+/* Bảng 2 cột nhỏ: Tham chiếu/Mở/Cao/Thấp/NN mua · Trần/Sàn/TB/GD h.trước/NN bán */
+.ms-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; font-size: 11px; }
+.ms-meta-grid .row {
+  display: flex; justify-content: space-between; gap: 6px;
+  padding: 3px 0; border-bottom: 1px solid var(--border);
+}
+.ms-meta-grid .row .k { color: var(--text-muted); }
+.ms-meta-grid .row .v { font-weight: 700; }
+
+/* Màu giá theo chuẩn TT VN */
+.px-up { color: var(--color-buy); }
+.px-down { color: var(--color-sell); }
+.px-ref { color: var(--color-ref); }
+.px-ceiling { color: var(--color-ceiling); }
+.px-floor { color: var(--color-floor); }
+
+.ms-section-title {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .4px; color: var(--text-muted); margin-top: 4px;
+}
+
+/* Bảng Dư mua | Giá | Dư bán */
+.ms-ob { font-size: 11px; }
+.ms-ob-head, .ms-ob-row, .ms-ob-total {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center;
+}
+.ms-ob-head { color: var(--text-muted); font-weight: 600; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.ms-ob-row { padding: 3px 0; }
+.ms-ob-row .bidvol { text-align: left; color: var(--color-buy); font-weight: 600; }
+.ms-ob-row .askvol { text-align: right; color: var(--color-sell); font-weight: 600; }
+.ms-ob-row .px { text-align: center; font-weight: 700; }
+.ms-ob-total { padding: 5px 0; border-top: 1px solid var(--border); font-weight: 700; }
+.ms-ob-total .l { text-align: left; color: var(--color-buy); }
+.ms-ob-total .c { text-align: center; color: var(--text-muted); font-weight: 600; }
+.ms-ob-total .r { text-align: right; color: var(--color-sell); }
+
+/* Lịch sử khớp trong cột */
+.ms-matches { font-size: 11px; }
+.ms-match-head, .ms-match-row {
+  display: grid; grid-template-columns: 1.3fr .7fr 1fr 1fr;
+  padding: 3px 0; align-items: center;
+}
+.ms-match-head { color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+.ms-match-row .match-side-buy .pill,
+.ms-match-row .match-side-sell .pill { padding: 1px 6px; font-size: 9px; }
+
+/* Khu phải dùng chung */
+.ms-side { display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow-y: auto; }
+
+/* KHU DƯỚI: sổ lệnh thu gọn/mở rộng + tab dọc */
+.ms-bottom { display: flex; flex-direction: column; flex-shrink: 0; }
+.ms-collapse-handle { display: flex; justify-content: center; margin-bottom: 4px; }
+.ms-collapse-handle button {
+  padding: 4px 16px; border: 1px solid var(--border-strong); background: var(--bg-panel);
+  color: var(--text-secondary); border-radius: 14px; cursor: pointer;
+  font-size: 11px; font-weight: 600;
+}
+.ms-collapse-handle button:hover { background: var(--bg-hover); }
+
+.ms-orders {
+  display: flex; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg-panel); overflow: hidden; height: 240px; transition: height .2s, border-color .2s;
+}
+.ms-orders.collapsed { height: 0; border-color: transparent; }
+
+.ms-tabs-vert {
+  display: flex; flex-direction: column; flex-shrink: 0; width: 160px;
+  border-right: 1px solid var(--border); background: var(--bg-panel-alt);
+}
+.ms-tabs-vert button {
+  padding: 12px 14px; border: none; background: transparent; text-align: left;
+  cursor: pointer; font-size: 12px; color: var(--text-secondary);
+  border-left: 3px solid transparent; transition: all .15s;
+}
+.ms-tabs-vert button.active {
+  color: var(--color-accent-text); background: var(--color-primary-light);
+  border-left-color: var(--color-accent); font-weight: 700;
+}
+.ms-tabs-vert button:hover:not(.active) { background: var(--bg-hover); }
+
+.ms-orders-content { flex: 1; overflow: auto; display: flex; flex-direction: column; }
+.ms-orders-content .orders-table-wrap { flex: 1; }
+
+/* Co cột về 2 khi màn hẹp */
+@media (max-width: 1280px) {
+  .ms-top { grid-template-columns: minmax(0, 1fr) 340px; }
+  .ms-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .ms-top { grid-template-columns: 1fr; }
+  .ms-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #view-multi { height: auto; overflow: visible; }
+}
 </style>
 </head>
 <body data-theme="light">
@@ -1740,6 +1924,11 @@ body {
     <a href="#">Tài khoản</a>
     <a href="#">Báo cáo</a>
   </nav>
+  <!-- Nút chuyển chế độ xem: Đơn mã / Nhiều mã (dùng lại style .mode-toggle) -->
+  <div class="mode-toggle view-mode-toggle" id="viewModeToggle" title="Chuyển chế độ xem">
+    <button class="active" data-view="single">1 mã</button>
+    <button data-view="multi">Nhiều mã</button>
+  </div>
   <div class="header-right">
     <div class="header-search">
       <input type="text" placeholder="Tìm kiếm...">
@@ -1754,6 +1943,9 @@ body {
     <button class="icon-btn" title="Tài khoản">👤</button>
   </div>
 </div>
+
+<!-- ============================================ VIEW: ĐƠN MÃ (giữ nguyên màn cũ) ============================================ -->
+<section id="view-single" class="view">
 
 <!-- ============================================ MAIN ============================================ -->
 <div class="main">
@@ -2085,6 +2277,137 @@ body {
   </div>
 
 </div>
+</section>
+
+<!-- ============================================ VIEW: NHIỀU MÃ (multi-symbol) ============================================ -->
+<!-- Component cha <MultiSymbolTradingView>: giữ state cột active, dựng 4 <SymbolColumn> + form dùng chung + sổ lệnh -->
+<section id="view-multi" class="view hidden">
+
+  <!-- Dải chỉ số thị trường (dùng lại .ticker) -->
+  <div class="ticker" id="msTicker">
+    <div class="ticker-item"><span class="symbol">VNINDEX</span><span class="price up">1.285,40</span><span class="change up">▲ 6,21 (+0,49%)</span></div>
+    <div class="ticker-item"><span class="symbol">VN30</span><span class="price up">1.342,10</span><span class="change up">▲ 8,03 (+0,60%)</span></div>
+    <div class="ticker-item"><span class="symbol">VN30F2506</span><span class="price down">1.338,50</span><span class="change down">▼ 2,10 (-0,16%)</span></div>
+    <div class="ticker-item"><span class="symbol">HNX</span><span class="price up">228,15</span><span class="change up">▲ 0,92 (+0,40%)</span></div>
+    <div class="ticker-item"><span class="symbol">UPCOM</span><span class="price ref">92,30</span><span class="change ref">— 0,00 (0,00%)</span></div>
+  </div>
+
+  <div class="ms-top">
+
+    <!-- THÂN TRÁI: 4 cột mã cố định (mỗi cột là 1 <SymbolColumn>) -->
+    <div class="ms-columns" id="msColumns"></div>
+
+    <!-- KHU VỰC PHẢI: form đặt lệnh DÙNG CHUNG + tài khoản/tài sản (mã = mã cột active) -->
+    <div class="ms-side">
+
+      <!-- Tài khoản (dùng lại .account-info-panel) -->
+      <div class="panel">
+        <div class="account-info-panel">
+          <div class="account-select">
+            <div class="customer-select-wrap">
+              <button type="button" class="customer-select-btn" disabled>
+                <span>000000 - Nguyễn Văn A</span><span class="dropdown-arrow">▾</span>
+              </button>
+            </div>
+            <select><option>Tiểu khoản 01</option></select>
+          </div>
+          <div class="account-row"><span class="label">Sức mua</span><span class="value">1.000.000.000 VND</span></div>
+          <div class="account-row"><span class="label">HM ưu đãi khả dụng</span><span class="value">500.000.000</span></div>
+          <div class="account-row"><span class="label">Tỷ lệ ký quỹ</span><span class="value green">40,00%</span></div>
+        </div>
+      </div>
+
+      <!-- Form đặt lệnh dùng chung (dùng lại .order-form-panel) -->
+      <div class="panel">
+        <div class="order-form-panel">
+          <div class="form-row-labeled">
+            <span class="form-label">Mã CK</span>
+            <div class="input-with-icon">
+              <input type="text" id="msFormSymbol" readonly style="font-weight:800">
+              <span class="input-icon" id="msFormExch"></span>
+            </div>
+          </div>
+          <div class="form-row-labeled">
+            <span class="form-label">Loại lệnh</span>
+            <div class="input-with-icon">
+              <select id="msOrderTypeSelect">
+                <option value="LO" selected>Lệnh thường</option>
+                <option value="PLO">Lệnh PLO</option>
+                <option value="ATC">Lệnh ATC</option>
+                <option value="MTL">Lệnh MTL</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row-labeled">
+            <span class="form-label">Khối lượng</span>
+            <div class="input-with-controls">
+              <button type="button" id="msQtyMinus">−</button>
+              <input type="number" id="msQtyInput" placeholder="Nhập khối lượng" step="100">
+              <button type="button" id="msQtyPlus">+</button>
+            </div>
+          </div>
+          <div class="form-row-labeled">
+            <span class="form-label">Giá đặt</span>
+            <div class="input-with-controls">
+              <button type="button" id="msPriceMinus">−</button>
+              <input type="number" id="msPriceInput" placeholder="Nhập giá" step="0.05">
+              <button type="button" id="msPricePlus">+</button>
+            </div>
+          </div>
+          <div class="order-type-chips" id="msOrderTypeChips">
+            <div class="chip active" data-type="LO">LO</div>
+            <div class="chip" data-type="PLO">PLO</div>
+            <div class="chip" data-type="ATC">ATC</div>
+            <div class="chip" data-type="MTL">MTL</div>
+          </div>
+          <div class="action-buttons">
+            <button class="btn-buy" id="msBtnBuy">MUA</button>
+            <button class="btn-sell" id="msBtnSell">BÁN</button>
+          </div>
+          <div class="max-row">
+            <div class="max-info-line buy"><span>Mua tối đa:</span><strong id="msMaxBuy">— CP</strong></div>
+            <div class="max-info-line sell"><span>Bán tối đa:</span><strong id="msMaxSell">— CP</strong></div>
+          </div>
+          <div class="order-value"><span class="label">Giá trị lệnh:</span><span class="value" id="msOrderValue">— VND</span></div>
+        </div>
+      </div>
+
+      <!-- Tài sản nhanh (dùng lại .quick-info-panel) -->
+      <div class="panel">
+        <div class="quick-info-panel">
+          <div class="account-row"><span class="label">Tổng lãi/lỗ</span><span class="value green">+ 125.000.000</span></div>
+          <div class="account-row"><span class="label">Biến động phiên</span><span class="value green">+ 0,82%</span></div>
+          <div class="account-row"><span class="label">Tài sản ròng (NAV)</span><span class="value">10.700.000.000</span></div>
+          <div class="account-row"><span class="label">Tiền mặt</span><span class="value">500.000.000</span></div>
+          <div class="account-row"><span class="label">Giá trị CK</span><span class="value">10.200.000.000</span></div>
+          <div class="account-row"><span class="label">Dư nợ</span><span class="value">0</span></div>
+          <div class="quick-actions">
+            <button>Chuyển tiền</button><button>Nộp tiền</button><button>Rút tiền</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- KHU VỰC DƯỚI: Sổ lệnh & Danh mục — tab dọc bên trái, thu gọn/mở rộng bằng nút mũi tên -->
+  <div class="ms-bottom">
+    <div class="ms-collapse-handle">
+      <button type="button" id="msCollapseBtn" title="Thu gọn / mở rộng">▼ Sổ lệnh &amp; Danh mục</button>
+    </div>
+    <div class="ms-orders" id="msOrders">
+      <div class="ms-tabs-vert" id="msOrdersTabs">
+        <button class="active" data-tab="pending">Lệnh chờ khớp</button>
+        <button data-tab="executed">Lệnh đã thực hiện</button>
+        <button data-tab="advance">Lệnh đặt trước</button>
+        <button data-tab="condition">Lệnh điều kiện</button>
+        <button data-tab="holdings">Danh mục nắm giữ</button>
+      </div>
+      <div class="ms-orders-content" id="msOrdersContent"></div>
+    </div>
+  </div>
+
+</section>
 
 <!-- ============================================ MODAL CONFIRM ============================================ -->
 <div class="modal-overlay" id="confirmModal">
@@ -2132,7 +2455,7 @@ body {
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal()">Hủy</button>
-      <button class="btn-primary" id="confirmBtn" onclick="confirmOrder()">Xác nhận</button>
+      <button class="btn-primary" id="confirmBtn" onclick="dispatchConfirm()">Xác nhận</button>
     </div>
   </div>
 </div>
@@ -3148,6 +3471,524 @@ window.addEventListener('DOMContentLoaded', () => {
     resizeTimer = setTimeout(renderChart, 200);
   });
 });
+
+// ===========================================================================
+// CHẾ ĐỘ XEM "NHIỀU MÃ" (multi-symbol) — component cha <MultiSymbolTradingView>
+// Độc lập, KHÔNG sửa logic đặt lệnh đơn mã. Tái dùng: dữ liệu `symbols`,
+// formatNumber/formatPrice/formatVND, showToast(), #confirmModal, mảng holdings.
+// ===========================================================================
+(function () {
+  const COLS = 4;
+
+  // "props" cấp cha: mã của từng cột + chỉ số cột đang active
+  // null = cột ở EMPTY STATE. Mặc định cột 1 = SHS, cột 2-4 rỗng.
+  let columnSymbols = ['SHS', null, null, null];
+  let activeCol = 0;
+
+  // TODO[highlight] — kiểu visual cột active CHƯA CHỐT. Đổi biến này để thử nhanh.
+  //   'border' = viền cam + nền nhạt (mặc định, xem .ms-column--active trong CSS)
+  // Khi thêm kiểu khác, xử lý nhánh tương ứng trong applyActiveHighlight().
+  let highlightStyle = 'border';
+
+  // TODO[empty-active] — quy tắc CHƯA CHỐT: cột rỗng KHÔNG được active.
+  // Khi chốt cho phép active cột rỗng, sửa canActivate() trả về true.
+  function canActivate(i) { return !!columnSymbols[i]; }
+
+  let msOrderType = 'LO';
+  let msPending = null;
+
+  const pad = (n) => String(n).padStart(2, '0');
+  const colEl = (i) => document.querySelector(`#msColumns .ms-column[data-index="${i}"]`);
+  const isMultiVisible = () => !document.getElementById('view-multi').classList.contains('hidden');
+
+  // -------------------------------------------------------------------------
+  // Dẫn xuất dữ liệu mở rộng cho khối giá trong cột (mock, để sẵn nối API sau)
+  // -------------------------------------------------------------------------
+  function msDerive(sym) {
+    const chart = sym.chart || [sym.refPrice];
+    const open = chart[0];
+    const high = Math.max(...chart);
+    const low = Math.min(...chart);
+    const accVol = (sym.bidVolumes || []).reduce((a, b) => a + b, 0)
+                 + (sym.askVolumes || []).reduce((a, b) => a + b, 0);
+    return {
+      open, high, low,
+      avg: +(((high + low) / 2)).toFixed(2),
+      prevClose: sym.refPrice,
+      foreignBuy: Math.round(((sym.bidVolumes || [0])[0]) * 0.15),
+      foreignSell: Math.round(((sym.askVolumes || [0])[0]) * 0.12),
+      accVol,
+      accVal: Math.round(accVol * sym.currentPrice * 1000),
+      // Ngày đáo hạn / Hợp đồng mở: chỉ áp dụng cho phái sinh → cổ phiếu hiển thị "—"
+      maturity: '—',
+      openInterest: '—'
+    };
+  }
+
+  function pxClass(sym, price) {
+    if (price >= sym.ceilingPrice) return 'px-ceiling';
+    if (price <= sym.floorPrice) return 'px-floor';
+    if (price > sym.refPrice) return 'px-up';
+    if (price < sym.refPrice) return 'px-down';
+    return 'px-ref';
+  }
+
+  function msMakeMatches(sym, n) {
+    const out = [];
+    const now = new Date();
+    const vols = [100, 200, 500, 1000, 2000, 5000];
+    for (let i = 0; i < n; i++) {
+      const buy = Math.random() < 0.5;
+      const t = new Date(now.getTime() - i * 7000);
+      out.push({
+        buy,
+        price: buy ? sym.bidPrices[0] : sym.askPrices[0],
+        vol: vols[Math.floor(Math.random() * vols.length)],
+        time: `${pad(t.getHours())}:${pad(t.getMinutes())}:${pad(t.getSeconds())}`
+      });
+    }
+    return out;
+  }
+
+  // -------------------------------------------------------------------------
+  // <SymbolColumn> — dựng vùng dữ liệu của 1 cột khi có mã hợp lệ
+  // -------------------------------------------------------------------------
+  function renderColData(sym) {
+    const d = msDerive(sym);
+    const up = sym.change >= 0;
+    const chCls = up ? 'px-up' : 'px-down';
+
+    let obRows = '';
+    for (let k = sym.askPrices.length - 1; k >= 0; k--) {
+      const p = sym.askPrices[k];
+      obRows += `<div class="ms-ob-row"><div class="bidvol"></div><div class="px ${pxClass(sym, p)}">${formatPrice(p)}</div><div class="askvol">${formatNumber(sym.askVolumes[k])}</div></div>`;
+    }
+    for (let k = 0; k < sym.bidPrices.length; k++) {
+      const p = sym.bidPrices[k];
+      obRows += `<div class="ms-ob-row"><div class="bidvol">${formatNumber(sym.bidVolumes[k])}</div><div class="px ${pxClass(sym, p)}">${formatPrice(p)}</div><div class="askvol"></div></div>`;
+    }
+    const totBid = sym.bidVolumes.reduce((a, b) => a + b, 0);
+    const totAsk = sym.askVolumes.reduce((a, b) => a + b, 0);
+
+    const mRows = msMakeMatches(sym, 6).map(m => `
+      <div class="ms-match-row">
+        <div>${m.time}</div>
+        <div class="match-side-${m.buy ? 'buy' : 'sell'}"><span class="pill">${m.buy ? 'M' : 'B'}</span></div>
+        <div>${formatNumber(m.vol)}</div>
+        <div class="${m.buy ? 'px-up' : 'px-down'}">${formatPrice(m.price)}</div>
+      </div>`).join('');
+
+    return `
+      <div class="ms-price-top">
+        <span class="ms-price ${chCls}">${formatPrice(sym.currentPrice)}</span>
+        <span class="ms-change ${chCls}">${up ? '▲' : '▼'} ${Math.abs(sym.change).toFixed(2).replace('.', ',')} (${up ? '+' : '-'}${Math.abs(sym.changePct).toFixed(2).replace('.', ',')}%)</span>
+      </div>
+      <div class="ms-sub-line"><span>Ngày đáo hạn: ${d.maturity}</span><span>HĐ mở: ${d.openInterest}</span></div>
+      <div class="ms-acc-line"><span class="label">KL lũy kế</span><span>${formatNumber(d.accVol)}</span></div>
+      <div class="ms-acc-line"><span class="label">GT lũy kế</span><span>${formatNumber(d.accVal)}</span></div>
+      <div class="ms-meta-grid">
+        <div class="row"><span class="k">Tham chiếu</span><span class="v px-ref">${formatPrice(sym.refPrice)}</span></div>
+        <div class="row"><span class="k">Trần</span><span class="v px-ceiling">${formatPrice(sym.ceilingPrice)}</span></div>
+        <div class="row"><span class="k">Mở cửa</span><span class="v">${formatPrice(d.open)}</span></div>
+        <div class="row"><span class="k">Sàn</span><span class="v px-floor">${formatPrice(sym.floorPrice)}</span></div>
+        <div class="row"><span class="k">Cao</span><span class="v px-up">${formatPrice(d.high)}</span></div>
+        <div class="row"><span class="k">Trung bình</span><span class="v">${formatPrice(d.avg)}</span></div>
+        <div class="row"><span class="k">Thấp</span><span class="v px-down">${formatPrice(d.low)}</span></div>
+        <div class="row"><span class="k">GD h.trước</span><span class="v">${formatPrice(d.prevClose)}</span></div>
+        <div class="row"><span class="k">NN mua</span><span class="v">${formatNumber(d.foreignBuy)}</span></div>
+        <div class="row"><span class="k">NN bán</span><span class="v">${formatNumber(d.foreignSell)}</span></div>
+      </div>
+      <div class="ms-section-title">Dư mua · Giá · Dư bán</div>
+      <div class="ms-ob">
+        <div class="ms-ob-head"><div>Dư mua</div><div style="text-align:center">Giá</div><div style="text-align:right">Dư bán</div></div>
+        ${obRows}
+        <div class="ms-ob-total"><div class="l">${formatNumber(totBid)}</div><div class="c">Tổng</div><div class="r">${formatNumber(totAsk)}</div></div>
+      </div>
+      <div class="ms-section-title">Khớp lệnh gần nhất</div>
+      <div class="ms-matches">
+        <div class="ms-match-head"><div>Thời gian</div><div>M/B</div><div>KL</div><div>Giá</div></div>
+        ${mRows}
+      </div>
+    `;
+  }
+
+  // Cập nhật 1 cột theo state hiện tại (giữ nguyên ô tìm mã khi đang gõ)
+  function renderColumn(i) {
+    const col = colEl(i);
+    if (!col) return;
+    const code = columnSymbols[i];
+    const exch = col.querySelector('[data-role="exch"]');
+    const data = col.querySelector('[data-role="data"]');
+    const inp = col.querySelector('.ms-col-search');
+
+    if (!code) {
+      exch.textContent = '';
+      if (document.activeElement !== inp) inp.value = '';
+      data.innerHTML = `<div class="ms-col-empty"><div class="ms-empty-icon">🔍</div><div>Nhập mã để xem dữ liệu</div></div>`;
+      return;
+    }
+    const sym = symbols[code];
+    exch.textContent = sym.exchange;
+    if (document.activeElement !== inp) inp.value = code;
+    data.innerHTML = renderColData(sym);
+  }
+
+  // Dựng khung 4 cột 1 lần (ô tìm mã giữ cố định để không mất focus khi tick)
+  function buildColumns() {
+    const wrap = document.getElementById('msColumns');
+    wrap.innerHTML = '';
+    for (let i = 0; i < COLS; i++) {
+      const col = document.createElement('div');
+      col.className = 'ms-column';
+      col.dataset.index = i;
+      col.innerHTML = `
+        <div class="ms-col-head">
+          <div class="symbol-search-wrap" style="margin-bottom:0">
+            <input class="symbol-search ms-col-search" data-index="${i}" list="msSymbolList" placeholder="Nhập mã..." autocomplete="off">
+          </div>
+          <div class="ms-col-exchange" data-role="exch"></div>
+        </div>
+        <div class="ms-col-data" data-role="data"></div>
+      `;
+      wrap.appendChild(col);
+    }
+
+    // datalist gợi ý mã (dùng lại danh sách symbols sẵn có)
+    let dl = document.getElementById('msSymbolList');
+    if (!dl) {
+      dl = document.createElement('datalist');
+      dl.id = 'msSymbolList';
+      document.body.appendChild(dl);
+    }
+    dl.innerHTML = Object.keys(symbols).map(c => `<option value="${c}">`).join('');
+
+    // Sự kiện: click cột để chọn active; gõ mã vào cột để load dữ liệu
+    wrap.querySelectorAll('.ms-column').forEach(col => {
+      const i = +col.dataset.index;
+      col.addEventListener('click', (e) => {
+        if (e.target.classList.contains('ms-col-search')) return; // đang gõ thì không chọn
+        selectColumn(i);
+      });
+      const inp = col.querySelector('.ms-col-search');
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { trySetSymbol(i, inp.value); inp.blur(); } });
+      inp.addEventListener('change', () => trySetSymbol(i, inp.value));
+    });
+  }
+
+  function trySetSymbol(i, raw) {
+    const code = (raw || '').trim().toUpperCase().split(/[\s-]/)[0];
+    if (!code) return;
+    if (symbols[code]) {
+      columnSymbols[i] = code;
+      renderColumn(i);
+      selectColumn(i); // load xong → tự active cột đó
+    } else {
+      showToast('error', 'Không tìm thấy mã', `Mã "${code}" không có trong danh sách`);
+      renderColumn(i); // khôi phục giá trị ô tìm mã
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // CƠ CHẾ CHỌN CỘT: tại 1 thời điểm chỉ 1 cột active
+  // -------------------------------------------------------------------------
+  function selectColumn(i) {
+    if (!canActivate(i)) {
+      // TODO[empty-active]: hiện chưa cho active cột rỗng — chỉ focus ô tìm mã
+      colEl(i).querySelector('.ms-col-search').focus();
+      return;
+    }
+    activeCol = i;
+    applyActiveHighlight();
+    bindFormToActive();
+  }
+
+  function applyActiveHighlight() {
+    document.querySelectorAll('#msColumns .ms-column').forEach(col => {
+      const i = +col.dataset.index;
+      const on = (i === activeCol) && canActivate(i);
+      // TODO[highlight]: rẽ nhánh theo highlightStyle nếu sau này có thêm kiểu khác
+      col.classList.toggle('ms-column--active', highlightStyle === 'border' && on);
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // <OrderForm> dùng chung — bind theo mã cột active
+  // -------------------------------------------------------------------------
+  function bindFormToActive() {
+    const code = columnSymbols[activeCol];
+    document.getElementById('msFormSymbol').value = code || '';
+    document.getElementById('msFormExch').textContent = code ? symbols[code].exchange : '';
+    const price = document.getElementById('msPriceInput');
+    if (code && msOrderType === 'LO' && !price.value) {
+      price.value = symbols[code].currentPrice.toFixed(2);
+    }
+    msUpdateMax();
+    msUpdateOrderValue();
+  }
+
+  function msSyncOrderTypeUI() {
+    document.querySelectorAll('#msOrderTypeChips .chip').forEach(c => c.classList.toggle('active', c.dataset.type === msOrderType));
+    const sel = document.getElementById('msOrderTypeSelect');
+    if (sel) sel.value = msOrderType;
+    const price = document.getElementById('msPriceInput');
+    if (msOrderType === 'LO') { price.disabled = false; price.placeholder = 'Nhập giá'; }
+    else { price.disabled = true; price.value = ''; price.placeholder = msOrderType; }
+    msUpdateOrderValue();
+  }
+
+  function msAdjustQty(d) {
+    const i = document.getElementById('msQtyInput');
+    i.value = Math.max(0, (parseInt(i.value) || 0) + d);
+    msUpdateOrderValue();
+  }
+  function msAdjustPrice(d) {
+    if (msOrderType !== 'LO') return;
+    const code = columnSymbols[activeCol];
+    const base = code ? symbols[code].refPrice : 0;
+    const i = document.getElementById('msPriceInput');
+    i.value = Math.max(0, +(((parseFloat(i.value) || base) + d)).toFixed(2));
+    msUpdateOrderValue();
+    msUpdateMax();
+  }
+  function msUpdateOrderValue() {
+    const q = parseInt(document.getElementById('msQtyInput').value) || 0;
+    const p = parseFloat(document.getElementById('msPriceInput').value) || 0;
+    const v = q * p * 1000;
+    document.getElementById('msOrderValue').textContent = v > 0 ? formatVND(v) : '— VND';
+  }
+  function msUpdateMax() {
+    const code = columnSymbols[activeCol];
+    const maxBuyEl = document.getElementById('msMaxBuy');
+    const maxSellEl = document.getElementById('msMaxSell');
+    if (!code) { maxBuyEl.textContent = '— CP'; maxSellEl.textContent = '— CP'; return; }
+    const sym = symbols[code];
+    const p = parseFloat(document.getElementById('msPriceInput').value) || sym.currentPrice;
+    const buyingPower = 1000000000; // mock 1 tỷ
+    const mb = p > 0 ? Math.floor(buyingPower / (p * 1000) / 100) * 100 : 0;
+    maxBuyEl.textContent = mb > 0 ? formatNumber(mb) + ' CP' : '— CP';
+    const hold = (holdings.find(h => h.code === code) || {}).tradableQty || 0;
+    maxSellEl.textContent = hold > 0 ? formatNumber(hold) + ' CP' : '0 CP';
+  }
+
+  // -------------------------------------------------------------------------
+  // Xác nhận đặt lệnh — DÙNG LẠI #confirmModal của màn đơn mã
+  // -------------------------------------------------------------------------
+  function msOpenConfirm(side) {
+    const code = columnSymbols[activeCol];
+    if (!code) { showToast('error', 'Chưa chọn mã', 'Hãy chọn một cột có mã hợp lệ'); return; }
+    const qty = parseInt(document.getElementById('msQtyInput').value) || 0;
+    const price = parseFloat(document.getElementById('msPriceInput').value) || 0;
+    if (qty <= 0) { showToast('error', 'Lỗi nhập liệu', 'Vui lòng nhập khối lượng hợp lệ'); return; }
+    if (msOrderType === 'LO' && price <= 0) { showToast('error', 'Lỗi nhập liệu', 'Vui lòng nhập giá đặt'); return; }
+
+    const sym = symbols[code];
+    msPending = { side, symbol: code, qty, price: msOrderType === 'LO' ? price : sym.currentPrice, type: msOrderType };
+
+    const header = document.getElementById('modalHeader');
+    const title = document.getElementById('modalTitle');
+    const sideEl = document.getElementById('confirmSide');
+    const btn = document.getElementById('confirmBtn');
+    header.classList.remove('buy', 'sell');
+    btn.classList.remove('buy', 'sell');
+    if (side === 'BUY') {
+      header.classList.add('buy'); btn.classList.add('buy');
+      title.textContent = 'Xác nhận lệnh MUA'; sideEl.textContent = 'MUA'; sideEl.className = 'detail-value buy';
+    } else {
+      header.classList.add('sell'); btn.classList.add('sell');
+      title.textContent = 'Xác nhận lệnh BÁN'; sideEl.textContent = 'BÁN'; sideEl.className = 'detail-value sell';
+    }
+    document.getElementById('confirmSymbol').textContent = code;
+    document.getElementById('confirmQty').textContent = formatNumber(qty);
+    document.getElementById('confirmPrice').textContent = msOrderType === 'LO' ? formatPrice(msPending.price) : msOrderType;
+    document.getElementById('confirmType').textContent = msOrderType === 'LO' ? 'Lệnh giới hạn (LO)' : msOrderType;
+    document.getElementById('confirmTotal').textContent = formatVND(msPending.qty * msPending.price * 1000);
+    document.getElementById('confirmModal').classList.add('open');
+  }
+
+  function msConfirmOrder() {
+    if (!msPending) return;
+    msOrdersData.unshift({
+      side: msPending.side, otype: msPending.type, symbol: msPending.symbol,
+      klDat: msPending.qty, klKhop: 0, giaDat: msPending.price, giaKhop: 0,
+      tongGt: msPending.qty * msPending.price * 1000, gtKhop: 0, status: 'waiting'
+    });
+    showToast('success', 'Đặt lệnh thành công',
+      `Lệnh ${msPending.side === 'BUY' ? 'MUA' : 'BÁN'} ${formatNumber(msPending.qty)} ${msPending.symbol} @ ${msPending.type === 'LO' ? formatPrice(msPending.price) : msPending.type}`);
+    document.getElementById('confirmModal').classList.remove('open');
+    msPending = null;
+    document.getElementById('msQtyInput').value = '';
+    if (msOrderType === 'LO') document.getElementById('msPriceInput').value = '';
+    msUpdateOrderValue();
+    const tabBtn = document.querySelector('#msOrdersTabs button.active');
+    if (tabBtn) msRenderOrders(tabBtn.dataset.tab);
+  }
+
+  // Bộ điều phối nút Xác nhận chung cho 2 màn: đa mã (khi view-multi mở) dùng msConfirmOrder,
+  // còn lại giữ nguyên confirmOrder() của màn đơn mã.
+  window.dispatchConfirm = function () {
+    if (isMultiVisible() && msPending) msConfirmOrder();
+    else confirmOrder();
+  };
+
+  // -------------------------------------------------------------------------
+  // <OrderBook> sổ lệnh dưới — tab dọc, dùng lại .orders-table
+  // -------------------------------------------------------------------------
+  let msOrdersData = [
+    { side: 'SELL', otype: 'LO',  symbol: 'SHS', klDat: 100000, klKhop: 30000, giaDat: 18.40, giaKhop: 18.40, tongGt: 1840000000, gtKhop: 552000000, status: 'partial' },
+    { side: 'BUY',  otype: 'LO',  symbol: 'HPG', klDat: 50000,  klKhop: 0,     giaDat: 28.45, giaKhop: 0,     tongGt: 1422500000, gtKhop: 0,         status: 'waiting' },
+    { side: 'SELL', otype: 'ATC', symbol: 'VNM', klDat: 20000,  klKhop: 20000, giaDat: 65.20, giaKhop: 65.20, tongGt: 1304000000, gtKhop: 1304000000, status: 'filled' },
+    { side: 'BUY',  otype: 'PLO', symbol: 'FPT', klDat: 5000,   klKhop: 5000,  giaDat: 133.50, giaKhop: 133.50, tongGt: 667500000, gtKhop: 667500000, status: 'filled' }
+  ];
+
+  function msStatus(s) {
+    return ({
+      waiting: ['CHỜ KHỚP', 'status-waiting'],
+      partial: ['KHỚP MỘT PHẦN', 'status-partial'],
+      filled: ['KHỚP HẾT', 'status-filled'],
+      cancelled: ['ĐÃ HỦY', 'status-cancelled']
+    })[s] || ['—', 'status-waiting'];
+  }
+
+  function msOrdersTable(rows) {
+    const body = rows.map(o => {
+      const isBuy = o.side === 'BUY';
+      const [stT, stC] = msStatus(o.status);
+      return `<tr>
+        <td><input type="checkbox"></td>
+        <td><span class="${isBuy ? 'up' : 'down'}" style="font-weight:700">${isBuy ? 'MUA' : 'BÁN'}</span> <span style="color:var(--text-muted)">${o.otype}</span></td>
+        <td><strong>${o.symbol}</strong></td>
+        <td>${formatNumber(o.klKhop)}|${formatNumber(o.klDat)}</td>
+        <td>${o.giaKhop ? formatPrice(o.giaKhop) : '—'}|${formatPrice(o.giaDat)}</td>
+        <td>${formatNumber(o.tongGt)}</td>
+        <td>${formatNumber(o.gtKhop)}</td>
+        <td><span class="status-pill ${stC}">${stT}</span></td>
+        <td><div class="action-btns"><button title="Sửa">✏️</button><button class="delete" title="Hủy">✕</button></div></td>
+      </tr>`;
+    }).join('');
+    return `
+      <div class="orders-filter">
+        <input type="text" placeholder="Tìm mã...">
+        <button class="btn-cancel-all" style="margin-left:auto">Hủy tất cả</button>
+      </div>
+      <div class="orders-table-wrap">
+        <table class="orders-table">
+          <thead><tr>
+            <th><input type="checkbox"></th><th>Lệnh</th><th>Mã GD</th>
+            <th>KL khớp|đặt</th><th>Giá khớp|đặt</th><th>Tổng GTGD</th>
+            <th>GT đã khớp</th><th>Trạng thái</th><th>Thao tác</th>
+          </tr></thead>
+          <tbody>${body || `<tr><td colspan="9" class="holdings-empty">Không có lệnh</td></tr>`}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function msHoldingsTable() {
+    const body = holdings.map(h => {
+      const pl = (h.currentPrice - h.avgPrice) * h.totalQty;
+      const pct = h.avgPrice ? ((h.currentPrice / h.avgPrice - 1) * 100) : 0;
+      const cls = pl > 0 ? 'pl-positive' : pl < 0 ? 'pl-negative' : 'pl-neutral';
+      const sg = pl > 0 ? '+ ' : pl < 0 ? '- ' : '';
+      return `<tr>
+        <td><input type="checkbox"></td>
+        <td><strong>${h.code}</strong></td>
+        <td>${formatNumber(h.totalQty)}</td>
+        <td><strong>${formatNumber(h.tradableQty)}</strong></td>
+        <td>${formatNumber(h.avgPrice)}</td>
+        <td>${formatNumber(h.currentPrice)}</td>
+        <td class="${cls}">${sg}${formatNumber(Math.abs(pl))} (${sg}${Math.abs(pct).toFixed(2).replace('.', ',')}%)</td>
+        <td><div class="holdings-action-row"><button class="btn-mini-action btn-oco">OCO</button><button class="btn-mini-action btn-sell-cp">Bán CP</button></div></td>
+      </tr>`;
+    }).join('');
+    return `
+      <div class="orders-filter">
+        <input type="text" placeholder="Tìm mã...">
+        <button class="btn-cancel-all" style="margin-left:auto">Bán tất cả</button>
+      </div>
+      <div class="orders-table-wrap">
+        <table class="orders-table holdings-table">
+          <thead><tr>
+            <th><input type="checkbox"></th><th>Mã CK</th><th>Tổng KL</th><th>KL được GD</th>
+            <th>Giá vốn</th><th>Giá hiện tại</th><th>Lãi/lỗ dự kiến</th><th>Thao tác</th>
+          </tr></thead>
+          <tbody>${body}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function msRenderOrders(tab) {
+    const c = document.getElementById('msOrdersContent');
+    if (tab === 'holdings') { c.innerHTML = msHoldingsTable(); return; }
+    if (tab === 'advance' || tab === 'condition') {
+      c.innerHTML = `<div class="holdings-empty">Chưa có ${tab === 'advance' ? 'lệnh đặt trước' : 'lệnh điều kiện'}</div>`;
+      return;
+    }
+    const rows = msOrdersData.filter(o => tab === 'pending'
+      ? (o.status === 'waiting' || o.status === 'partial')
+      : o.status === 'filled');
+    c.innerHTML = msOrdersTable(rows);
+  }
+
+  // -------------------------------------------------------------------------
+  // KHỞI TẠO + chuyển chế độ xem
+  // -------------------------------------------------------------------------
+  window.addEventListener('DOMContentLoaded', () => {
+    buildColumns();
+    columnSymbols.forEach((c, i) => renderColumn(i));
+    applyActiveHighlight();
+    bindFormToActive();
+    msSyncOrderTypeUI();
+    msRenderOrders('pending');
+
+    // Sự kiện form
+    document.getElementById('msQtyMinus').addEventListener('click', () => msAdjustQty(-100));
+    document.getElementById('msQtyPlus').addEventListener('click', () => msAdjustQty(100));
+    document.getElementById('msPriceMinus').addEventListener('click', () => msAdjustPrice(-0.1));
+    document.getElementById('msPricePlus').addEventListener('click', () => msAdjustPrice(0.1));
+    document.getElementById('msQtyInput').addEventListener('input', () => { msUpdateOrderValue(); msUpdateMax(); });
+    document.getElementById('msPriceInput').addEventListener('input', () => { msUpdateOrderValue(); msUpdateMax(); });
+    document.getElementById('msBtnBuy').addEventListener('click', () => msOpenConfirm('BUY'));
+    document.getElementById('msBtnSell').addEventListener('click', () => msOpenConfirm('SELL'));
+    document.getElementById('msOrderTypeSelect').addEventListener('change', (e) => { msOrderType = e.target.value; msSyncOrderTypeUI(); });
+    document.querySelectorAll('#msOrderTypeChips .chip').forEach(ch =>
+      ch.addEventListener('click', () => { msOrderType = ch.dataset.type; msSyncOrderTypeUI(); }));
+
+    // Tab dọc sổ lệnh
+    document.querySelectorAll('#msOrdersTabs button').forEach(b =>
+      b.addEventListener('click', () => {
+        document.querySelectorAll('#msOrdersTabs button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        msRenderOrders(b.dataset.tab);
+      }));
+
+    // Thu gọn / mở rộng sổ lệnh
+    document.getElementById('msCollapseBtn').addEventListener('click', () => {
+      const collapsed = document.getElementById('msOrders').classList.toggle('collapsed');
+      document.getElementById('msCollapseBtn').textContent = (collapsed ? '▲' : '▼') + ' Sổ lệnh & Danh mục';
+    });
+
+    // Nút chuyển chế độ xem 1 mã / Nhiều mã
+    const viewToggle = document.getElementById('viewModeToggle');
+    viewToggle.querySelectorAll('button').forEach(b =>
+      b.addEventListener('click', () => {
+        viewToggle.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        const v = b.dataset.view;
+        document.getElementById('view-single').classList.toggle('hidden', v !== 'single');
+        document.getElementById('view-multi').classList.toggle('hidden', v !== 'multi');
+        if (v === 'multi') {
+          columnSymbols.forEach((c, i) => renderColumn(i));
+          applyActiveHighlight();
+          bindFormToActive();
+        }
+      }));
+
+    // Mô phỏng dữ liệu chạy: làm mới các cột có mã (chỉ khi đang xem chế độ nhiều mã)
+    setInterval(() => {
+      if (!isMultiVisible()) return;
+      columnSymbols.forEach((c, i) => { if (c) renderColumn(i); });
+    }, 4000);
+  });
+})();
 </script>
 
 </body>
