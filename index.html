@@ -1738,12 +1738,20 @@ body {
   overflow: hidden;
 }
 
-/* Khu trên: 4 cột + form phải */
-.ms-top {
+/* Thân: bên trái (4 cột + sổ lệnh) | bên phải (form cao hết màn hình) */
+.ms-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 400px;
+  grid-template-columns: minmax(0, 1fr) 360px;
   gap: 10px;
   flex: 1;
+  min-height: 0;
+}
+
+.ms-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
   min-height: 0;
 }
 
@@ -1752,6 +1760,7 @@ body {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+  flex: 1;
   min-width: 0;
   min-height: 0;
 }
@@ -1859,10 +1868,16 @@ body {
 .ms-match-row .match-side-buy .pill,
 .ms-match-row .match-side-sell .pill { padding: 1px 6px; font-size: 9px; }
 
-/* Khu phải dùng chung */
-.ms-side { display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow-y: auto; }
+/* Khu phải dùng chung — cột dọc cao hết chiều cao thân, cuộn khi tràn */
+.ms-side {
+  display: flex; flex-direction: column; gap: 8px;
+  min-height: 0; overflow-y: auto;
+  background: var(--color-primary-light);
+  border-radius: 8px;
+  padding: 8px;
+}
 
-/* KHU DƯỚI: sổ lệnh thu gọn/mở rộng + tab dọc */
+/* KHU DƯỚI: sổ lệnh thu gọn/mở rộng + tab dọc (nằm trong cột trái) */
 .ms-bottom { display: flex; flex-direction: column; flex-shrink: 0; }
 .ms-collapse-handle { display: flex; justify-content: center; margin-bottom: 4px; }
 .ms-collapse-handle button {
@@ -1898,11 +1913,11 @@ body {
 
 /* Co cột về 2 khi màn hẹp */
 @media (max-width: 1280px) {
-  .ms-top { grid-template-columns: minmax(0, 1fr) 340px; }
+  .ms-body { grid-template-columns: minmax(0, 1fr) 320px; }
   .ms-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
-  .ms-top { grid-template-columns: 1fr; }
+  .ms-body { grid-template-columns: 1fr; }
   .ms-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #view-multi { height: auto; overflow: visible; }
 }
@@ -2292,12 +2307,34 @@ body {
     <div class="ticker-item"><span class="symbol">UPCOM</span><span class="price ref">92,30</span><span class="change ref">— 0,00 (0,00%)</span></div>
   </div>
 
-  <div class="ms-top">
+  <div class="ms-body">
 
-    <!-- THÂN TRÁI: 4 cột mã cố định (mỗi cột là 1 <SymbolColumn>) -->
-    <div class="ms-columns" id="msColumns"></div>
+    <!-- BÊN TRÁI: 4 cột mã + sổ lệnh dưới -->
+    <div class="ms-main">
 
-    <!-- KHU VỰC PHẢI: form đặt lệnh DÙNG CHUNG + tài khoản/tài sản (mã = mã cột active) -->
+      <!-- THÂN TRÁI: 4 cột mã cố định (mỗi cột là 1 <SymbolColumn>) -->
+      <div class="ms-columns" id="msColumns"></div>
+
+      <!-- KHU VỰC DƯỚI: Sổ lệnh & Danh mục — tab dọc, thu gọn/mở rộng bằng nút mũi tên -->
+      <div class="ms-bottom">
+        <div class="ms-collapse-handle">
+          <button type="button" id="msCollapseBtn" title="Thu gọn / mở rộng">▼ Sổ lệnh &amp; Danh mục</button>
+        </div>
+        <div class="ms-orders" id="msOrders">
+          <div class="ms-tabs-vert" id="msOrdersTabs">
+            <button class="active" data-tab="pending">Lệnh chờ khớp</button>
+            <button data-tab="executed">Lệnh đã thực hiện</button>
+            <button data-tab="advance">Lệnh đặt trước</button>
+            <button data-tab="condition">Lệnh điều kiện</button>
+            <button data-tab="holdings">Danh mục nắm giữ</button>
+          </div>
+          <div class="ms-orders-content" id="msOrdersContent"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- KHU VỰC PHẢI: form đặt lệnh DÙNG CHUNG + tài khoản/tài sản (cao hết màn hình) -->
     <div class="ms-side">
 
       <!-- Tài khoản (dùng lại .account-info-panel) -->
@@ -2387,23 +2424,6 @@ body {
         </div>
       </div>
 
-    </div>
-  </div>
-
-  <!-- KHU VỰC DƯỚI: Sổ lệnh & Danh mục — tab dọc bên trái, thu gọn/mở rộng bằng nút mũi tên -->
-  <div class="ms-bottom">
-    <div class="ms-collapse-handle">
-      <button type="button" id="msCollapseBtn" title="Thu gọn / mở rộng">▼ Sổ lệnh &amp; Danh mục</button>
-    </div>
-    <div class="ms-orders" id="msOrders">
-      <div class="ms-tabs-vert" id="msOrdersTabs">
-        <button class="active" data-tab="pending">Lệnh chờ khớp</button>
-        <button data-tab="executed">Lệnh đã thực hiện</button>
-        <button data-tab="advance">Lệnh đặt trước</button>
-        <button data-tab="condition">Lệnh điều kiện</button>
-        <button data-tab="holdings">Danh mục nắm giữ</button>
-      </div>
-      <div class="ms-orders-content" id="msOrdersContent"></div>
     </div>
   </div>
 
